@@ -9,30 +9,63 @@
   line-height: var(--reader-line-height) !important;
 }
 
+/* Keep the serial visually continuous: no blank-line-sized gaps between units. */
 .story-pair {
-  margin-bottom: calc(0.95em * var(--reader-line-height));
+  margin: 0 0 .42em;
+}
+
+.story-pair:empty,
+.story-pair p:empty {
+  display: none !important;
+}
+
+.story-pair .en,
+.story-pair .zh {
+  margin-bottom: 0;
 }
 
 .story-pair .zh {
-  margin-top: .38em;
+  margin-top: .14em;
 }
 
+/* Reading controls must remain a single row on every viewport. */
+.reader-tools {
+  flex-wrap: nowrap !important;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.segmented,
+.font-tools,
 .line-tools {
   display: flex;
+  min-width: 0;
   align-items: center;
-  gap: 4px;
+  flex: 0 1 auto;
+  gap: 2px;
+  white-space: nowrap;
 }
 
+.segmented {
+  flex: 1 1 auto;
+}
+
+.reader-tools button,
 .line-tools button {
-  min-width: 42px;
+  min-width: 30px;
+  height: 36px;
+  padding: 0 6px;
+  flex: 0 1 auto;
 }
 
+#fontSizeLabel,
 #lineHeightLabel {
-  min-width: 38px;
+  min-width: 32px;
   text-align: center;
   color: var(--muted);
   font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 11px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
 }
 
 .chapter-navigation {
@@ -87,14 +120,29 @@
 
 @media (max-width: 640px) {
   .reader-tools {
-    flex-wrap: wrap;
+    width: calc(100% - 12px);
+    right: max(6px, env(safe-area-inset-right));
+    left: max(6px, env(safe-area-inset-left));
+    padding: 6px;
+    gap: 3px;
   }
 
-  .segmented,
-  .font-tools,
-  .line-tools {
-    flex: 1 1 auto;
-    justify-content: center;
+  .reader-tools button,
+  .line-tools button {
+    min-width: 28px;
+    height: 34px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+
+  .segmented button {
+    min-width: 29px;
+  }
+
+  #fontSizeLabel,
+  #lineHeightLabel {
+    min-width: 29px;
+    font-size: 9px;
   }
 
   .chapter-navigation {
@@ -103,5 +151,29 @@
 
   .chapter-nav-link.next {
     text-align: left;
+  }
+}
+
+@media (max-width: 360px) {
+  .reader-tools {
+    gap: 2px;
+    padding: 5px;
+  }
+
+  .reader-tools button,
+  .line-tools button {
+    min-width: 26px;
+    padding: 0 3px;
+    font-size: 11px;
+  }
+
+  .segmented button {
+    min-width: 27px;
+  }
+
+  #fontSizeLabel,
+  #lineHeightLabel {
+    min-width: 27px;
+    font-size: 8.5px;
   }
 }
