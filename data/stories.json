@@ -27,6 +27,22 @@
       "status": "ongoing",
       "chapters": [
         {
+          "episode": 1,
+          "publishedAt": "2026-08-29",
+          "slug": "the-voice-in-the-alder-grove",
+          "title": {
+            "en": "Chapter One — The Voice in the Alder Grove",
+            "zhHant": "第一章——榿木林中的聲音",
+            "zhHans": "第一章——桤木林中的声音"
+          },
+          "recap": {
+            "en": "The story begins. Geralt of Rivia is traveling south of the Pontar when bad weather forces him to stop in the village of Ravelin, where a series of mutilated animals hints at something far stranger than wolves.",
+            "zh": "故事就此揭幕。利維亞的傑洛特正沿著龐塔爾河以南一路前行，一場惡劣的風雨迫使他在拉維林村暫時落腳。然而，村中接連出現遭到殘忍肢解的動物屍體——種種跡象顯示，潛伏在附近的東西，恐怕遠比狼群更加詭異。"
+          },
+          "contentFile": "./data/chapter-01-content.json.gz.b64",
+          "glossary": {}
+        },
+        {
           "episode": 2,
           "publishedAt": "2026-08-30",
           "slug": "the-thing-that-knows-your-name",
