@@ -1,7 +1,7 @@
 const LINE_HEIGHT_MIN = 1.35;
 const LINE_HEIGHT_MAX = 2.05;
 const LINE_HEIGHT_STEP = 0.1;
-const READER_CHROME_HIDE_DELAY = 2500;
+const READER_CHROME_HIDE_DELAY = 2200;
 
 function readSavedLineHeight() {
   const saved = Number(localStorage.getItem("pathnotes-line-height") || "1.65");
@@ -41,8 +41,10 @@ function applyReaderLineHeight() {
   document.documentElement.style.setProperty("--reader-line-height", readerLineHeight.toFixed(2));
   const label = document.querySelector("#lineHeightLabel");
   if (label) label.textContent = readerLineHeight.toFixed(2).replace(/0$/, "");
+
   const down = document.querySelector("#lineHeightDown");
   const up = document.querySelector("#lineHeightUp");
+
   if (down) {
     down.setAttribute("aria-label", lineHeightLocaleText("down"));
     down.title = lineHeightLocaleText("down");
@@ -71,9 +73,9 @@ function addChapterNavigation(bookSlug, storySlug) {
   if (!reader) return;
 
   reader.querySelector(".chapter-navigation")?.remove();
-
   const book = findBook(bookSlug);
   if (!book) return;
+
   const chapters = [...(book.chapters || [])].sort((a, b) => Number(a.episode) - Number(b.episode));
   const index = chapters.findIndex(chapter => chapter.slug === storySlug);
   if (index < 0) return;
@@ -108,26 +110,32 @@ function addChapterNavigation(bookSlug, storySlug) {
 }
 
 function clearReaderChromeTimer() {
-  if (readerChromeTimer) {
+  if (readerChromeTimer !== null) {
     window.clearTimeout(readerChromeTimer);
     readerChromeTimer = null;
   }
 }
 
+function isActualReaderPage() {
+  return document.body.classList.contains("is-reader") && Boolean(document.querySelector(".reader"));
+}
+
 function hideReaderChrome() {
-  if (!document.body.classList.contains("is-reader")) return;
-  document.body.classList.add("reader-chrome-hidden");
+  if (!isActualReaderPage()) return;
   clearReaderChromeTimer();
+  document.body.classList.add("reader-chrome-hidden");
 }
 
 function scheduleReaderChromeHide(delay = READER_CHROME_HIDE_DELAY) {
   clearReaderChromeTimer();
-  if (!document.body.classList.contains("is-reader")) return;
-  readerChromeTimer = window.setTimeout(hideReaderChrome, delay);
+  if (!isActualReaderPage()) return;
+  readerChromeTimer = window.setTimeout(() => {
+    if (isActualReaderPage()) hideReaderChrome();
+  }, delay);
 }
 
-function showReaderChrome({ autoHide = true } = {}) {
-  if (!document.body.classList.contains("is-reader")) return;
+function showReaderChrome(autoHide = true) {
+  if (!isActualReaderPage()) return;
   document.body.classList.remove("reader-chrome-hidden");
   if (autoHide) scheduleReaderChromeHide();
 }
@@ -138,54 +146,62 @@ function isReaderChromeInteractiveTarget(target) {
   ));
 }
 
-function resetReaderChromeForRoute() {
-  clearReaderChromeTimer();
-  document.body.classList.remove("reader-chrome-hidden");
-  if (document.body.classList.contains("is-reader")) scheduleReaderChromeHide();
-}
-
-const renderStoryWithPairs = renderStory;
-renderStory = async function renderStoryWithExtras(bookSlug, storySlug) {
-  await renderStoryWithPairs(bookSlug, storySlug);
+function syncReaderEnhancements() {
   applyReaderLineHeight();
-  addChapterNavigation(bookSlug, storySlug);
-  resetReaderChromeForRoute();
-};
+
+  const match = location.hash.match(/^#\/book\/([^/]+)\/story\/(.+)$/);
+  if (match && document.querySelector(".reader")) {
+    addChapterNavigation(decodeURIComponent(match[1]), decodeURIComponent(match[2]));
+    document.body.classList.remove("reader-chrome-hidden");
+    scheduleReaderChromeHide();
+  } else {
+    clearReaderChromeTimer();
+    document.body.classList.remove("reader-chrome-hidden");
+  }
+}
 
 document.querySelector("#lineHeightDown")?.addEventListener("click", () => {
   changeReaderLineHeight(-LINE_HEIGHT_STEP);
-  showReaderChrome();
+  showReaderChrome(true);
 });
 
 document.querySelector("#lineHeightUp")?.addEventListener("click", () => {
   changeReaderLineHeight(LINE_HEIGHT_STEP);
-  showReaderChrome();
+  showReaderChrome(true);
 });
 
-/* A normal tap on the reading surface restores the bars. Interactive controls
-   keep their normal behavior and merely refresh the auto-hide timer. */
-document.addEventListener("pointerup", event => {
-  if (!document.body.classList.contains("is-reader")) return;
+/* Tap the reading surface to restore the chrome. Controls and word lookup keep
+   their own behavior and only restart the auto-hide countdown. */
+document.addEventListener("click", event => {
+  if (!isActualReaderPage()) return;
 
   if (isReaderChromeInteractiveTarget(event.target)) {
     if (!document.body.classList.contains("reader-chrome-hidden")) scheduleReaderChromeHide();
     return;
   }
 
-  showReaderChrome();
-});
+  showReaderChrome(true);
+}, true);
 
-/* Once the user starts reading/scrolling, get the chrome out of the way. */
+/* Scrolling or swiping means the user is actively reading: hide immediately. */
 window.addEventListener("scroll", () => {
-  if (!document.body.classList.contains("is-reader")) return;
-  if (window.scrollY > 12) hideReaderChrome();
+  if (isActualReaderPage()) hideReaderChrome();
 }, { passive: true });
 
+document.addEventListener("touchmove", () => {
+  if (isActualReaderPage()) hideReaderChrome();
+}, { passive: true });
+
+/* The app replaces #app contents on every route. Observe that actual DOM
+   change so chrome setup works regardless of which renderStory wrapper ran. */
+const readerObserver = new MutationObserver(() => {
+  window.requestAnimationFrame(syncReaderEnhancements);
+});
+readerObserver.observe(document.querySelector("#app"), { childList: true, subtree: false });
+
 window.addEventListener("hashchange", () => {
-  if (!location.hash.includes("/story/")) {
-    clearReaderChromeTimer();
-    document.body.classList.remove("reader-chrome-hidden");
-  }
+  window.requestAnimationFrame(syncReaderEnhancements);
 });
 
 applyReaderLineHeight();
+window.requestAnimationFrame(syncReaderEnhancements);
