@@ -2,44 +2,50 @@
 // In bilingual mode, English and Chinese are interleaved. Single-language
 // modes still use the same DOM and are controlled by the existing CSS rules.
 
+function cleanStoryText(text) {
+  return String(text || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
+
 function splitEnglishSentences(text) {
-  const value = String(text || "").trim();
+  const value = cleanStoryText(text);
   if (!value) return [];
 
   if (typeof Intl.Segmenter === "function") {
     try {
       return [...new Intl.Segmenter("en", { granularity: "sentence" }).segment(value)]
-        .map(item => item.segment.trim())
+        .map(item => cleanStoryText(item.segment))
         .filter(Boolean);
     } catch {
       // Fall through to regex.
     }
   }
 
-  return value.match(/[^.!?]+(?:[.!?]+[”"']*|$)/g)?.map(s => s.trim()).filter(Boolean) || [value];
+  return value.match(/[^.!?]+(?:[.!?]+[”"']*|$)/g)?.map(s => cleanStoryText(s)).filter(Boolean) || [value];
 }
 
 function splitChineseSentences(text) {
-  const value = String(text || "").trim();
+  const value = cleanStoryText(text);
   if (!value) return [];
-  return value.match(/[^。！？!?]+(?:[。！？!?]+[」』”"']*|$)/g)?.map(s => s.trim()).filter(Boolean) || [value];
+  return value.match(/[^。！？!?]+(?:[。！？!?]+[」』”"']*|$)/g)?.map(s => cleanStoryText(s)).filter(Boolean) || [value];
 }
 
 function expandPairToSentencePairs(pair) {
-  const en = String(pair?.en || "").trim();
-  const zh = String(pair?.zh || "").trim();
+  const en = cleanStoryText(pair?.en);
+  const zh = cleanStoryText(pair?.zh);
   if (!en && !zh) return [];
 
   const enSentences = splitEnglishSentences(en);
   const zhSentences = splitChineseSentences(zh);
 
-  // Only split further when sentence counts line up exactly. Otherwise keep
-  // the original paragraph/utterance pair so translations never drift.
   if (enSentences.length > 1 && enSentences.length === zhSentences.length) {
-    return enSentences.map((sentence, index) => ({
-      en: sentence,
-      zh: zhSentences[index]
-    }));
+    return enSentences
+      .map((sentence, index) => ({ en: sentence, zh: zhSentences[index] }))
+      .filter(item => item.en || item.zh);
   }
 
   return [{ en, zh }];
@@ -47,7 +53,9 @@ function expandPairToSentencePairs(pair) {
 
 function storyPairs(story) {
   if (Array.isArray(story.content?.pairs) && story.content.pairs.length) {
-    return story.content.pairs.flatMap(expandPairToSentencePairs);
+    return story.content.pairs
+      .flatMap(expandPairToSentencePairs)
+      .filter(pair => cleanStoryText(pair.en) || cleanStoryText(pair.zh));
   }
 
   const en = story.content?.en || story.paragraphs?.map(p => p.en).filter(Boolean) || [];
@@ -56,14 +64,15 @@ function storyPairs(story) {
   const pairs = [];
 
   for (let i = 0; i < count; i += 1) {
-    pairs.push({ en: en[i] || "", zh: zh[i] || "" });
+    const pair = { en: cleanStoryText(en[i]), zh: cleanStoryText(zh[i]) };
+    if (pair.en || pair.zh) pairs.push(pair);
   }
 
-  return pairs.flatMap(expandPairToSentencePairs);
+  return pairs.flatMap(expandPairToSentencePairs).filter(pair => pair.en || pair.zh);
 }
 
 function isDialoguePair(pair) {
-  const value = String(pair?.en || pair?.zh || "").trim();
+  const value = cleanStoryText(pair?.en || pair?.zh);
   return /^[“"「『]/.test(value);
 }
 
@@ -107,27 +116,31 @@ renderStory = async function renderStoryPaired(bookSlug, storySlug) {
   storyBody.replaceChildren();
 
   storyPairs(story).forEach((pair, index) => {
+    const enText = cleanStoryText(pair.en);
+    const zhText = cleanStoryText(pair.zh);
+    if (!enText && !zhText) return;
+
     const wrapper = document.createElement("div");
     wrapper.className = `story-pair${isDialoguePair(pair) ? " dialogue" : ""}`;
     wrapper.dataset.pairIndex = String(index);
 
-    if (pair.en) {
+    if (enText) {
       const en = document.createElement("p");
       en.className = "en content-en";
       en.lang = "en";
-      en.innerHTML = tokenizeEnglish(pair.en);
+      en.innerHTML = tokenizeEnglish(enText);
       wrapper.appendChild(en);
     }
 
-    if (pair.zh) {
+    if (zhText) {
       const zh = document.createElement("p");
       zh.className = "zh content-zh";
       zh.lang = "zh-Hant";
-      zh.textContent = pair.zh;
+      zh.textContent = zhText;
       wrapper.appendChild(zh);
     }
 
-    storyBody.appendChild(wrapper);
+    if (wrapper.childElementCount) storyBody.appendChild(wrapper);
   });
 
   app.replaceChildren(fragment);
