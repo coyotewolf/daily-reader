@@ -1,0 +1,9 @@
+{
+  "name": "Path Notes — Daily Bilingual Stories",
+  "short_name": "Path Notes",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#11110f",
+  "theme_color": "#11110f",
+  "description": "Mobile-first bilingual daily reading journal."
+}
