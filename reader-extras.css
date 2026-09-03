@@ -68,6 +68,25 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Ebook-style reading chrome: hide top and bottom bars while reading. */
+body.is-reader .topbar,
+body.is-reader .reader-tools {
+  transition: transform .24s ease, opacity .2s ease;
+  will-change: transform, opacity;
+}
+
+body.is-reader.reader-chrome-hidden .topbar {
+  transform: translateY(calc(-100% - 8px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.is-reader.reader-chrome-hidden .reader-tools {
+  transform: translateY(calc(100% + 22px));
+  opacity: 0;
+  pointer-events: none;
+}
+
 .chapter-navigation {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -175,5 +194,12 @@
   #lineHeightLabel {
     min-width: 27px;
     font-size: 8.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.is-reader .topbar,
+  body.is-reader .reader-tools {
+    transition: none;
   }
 }
