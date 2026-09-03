@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#11110f" />
+  <meta name="description" content="A mobile-first bilingual daily Witcher-inspired reading journal." />
+  <title>Path Notes｜每日獵魔士雙語短篇</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/" aria-label="回到首頁">
+      <span class="brand-mark" aria-hidden="true">☽</span>
+      <span>
+        <strong>Path Notes</strong>
+        <small>每日雙語短篇</small>
+      </span>
+    </a>
+    <button id="themeToggle" class="icon-button" type="button" aria-label="切換夜間模式" title="切換夜間模式">◐</button>
+  </header>
+
+  <main id="app" class="app-shell" aria-live="polite"></main>
+
+  <aside class="reader-tools" aria-label="閱讀設定">
+    <div class="segmented" role="group" aria-label="語言顯示">
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="zh">中</button>
+      <button type="button" data-lang="both" class="active">雙語</button>
+    </div>
+    <div class="font-tools">
+      <button id="fontDown" type="button" aria-label="縮小字體">A−</button>
+      <span id="fontSizeLabel" aria-live="polite">100%</span>
+      <button id="fontUp" type="button" aria-label="放大字體">A＋</button>
+    </div>
+  </aside>
+
+  <template id="homeTemplate">
+    <section class="hero">
+      <p class="eyebrow">DAILY READING JOURNAL</p>
+      <h1>沿著大陸的道路，<br />每天讀一小段故事。</h1>
+      <p>以英文閱讀情境、用中文確認理解。可自由切換單語或雙語模式。</p>
+    </section>
+    <section>
+      <div class="section-heading">
+        <h2>所有篇章</h2>
+        <span id="storyCount" class="muted"></span>
+      </div>
+      <div id="storyList" class="story-list"></div>
+    </section>
+  </template>
+
+  <template id="readerTemplate">
+    <article class="reader">
+      <a class="back-link" href="#/">← 所有篇章</a>
+      <header class="story-header">
+        <p id="storyMeta" class="eyebrow"></p>
+        <h1 id="storyTitle"></h1>
+        <p id="storySubtitle" class="story-subtitle"></p>
+      </header>
+      <section id="recapBox" class="recap-box">
+        <span>Previously</span>
+        <p id="storyRecap"></p>
+      </section>
+      <div id="storyBody" class="story-body"></div>
+      <footer class="story-footer">
+        <div>
+          <span class="muted">閱讀完畢</span>
+          <strong id="endingLine">The Path continues tomorrow.</strong>
+        </div>
+        <a href="#/" class="soft-button">回到篇章列表</a>
+      </footer>
+    </article>
+  </template>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
