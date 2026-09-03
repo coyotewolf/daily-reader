@@ -5,20 +5,24 @@
       "volume": 1,
       "coverTitle": {
         "en": "PATH NOTES",
-        "zh": "旅途札記"
+        "zh": "旅途札記",
+        "zhHans": "旅途札记"
       },
       "coverMark": {
         "en": "THE CONTINENT",
-        "zh": "大陸"
+        "zh": "大陸",
+        "zhHans": "大陆"
       },
       "coverTheme": "ember",
       "title": {
         "en": "The Witcher: Path Notes",
-        "zh": "獵魔士：旅途札記"
+        "zh": "獵魔士：旅途札記",
+        "zhHans": "猎魔士：旅途札记"
       },
       "description": {
         "en": "Geralt travels the roads of the Continent between familiar events, one quiet contract and human choice at a time.",
-        "zh": "傑洛特行走於大陸的道路，在熟悉事件之間，一次次面對不起眼的委託與人的選擇。"
+        "zh": "傑洛特行走於大陸的道路，在熟悉事件之間，一次次面對不起眼的委託與人的選擇。",
+        "zhHans": "杰洛特行走于大陆的道路，在熟悉事件之间，一次次面对不起眼的委托与人的选择。"
       },
       "status": "ongoing",
       "chapters": [
@@ -28,7 +32,8 @@
           "slug": "rain-on-the-pontar-road",
           "title": {
             "en": "Rain on the Pontar Road",
-            "zh": "龐塔爾河畔的雨"
+            "zh": "龐塔爾河畔的雨",
+            "zhHans": "庞塔尔河畔的雨"
           },
           "excerpt": "A wet road, a tired witcher, and one village that is far too quiet.",
           "recap": "Geralt has been riding south beneath three days of cold rain, looking for little more than a dry stable, a hot meal, and a few hours without trouble.",
