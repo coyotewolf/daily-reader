@@ -1,0 +1,46 @@
+[
+  {
+    "episode": 1,
+    "date": "2026-09-04",
+    "slug": "rain-on-the-pontar-road",
+    "title": {
+      "en": "Rain on the Pontar Road",
+      "zh": "龐塔爾河畔的雨"
+    },
+    "excerpt": "A wet road, a tired witcher, and one village that is far too quiet.",
+    "recap": "Geralt has been riding south beneath three days of cold rain, looking for little more than a dry stable, a hot meal, and a few hours without trouble.",
+    "ending": "Some roads end at an inn. Others begin there.",
+    "paragraphs": [
+      {
+        "type": "narration",
+        "en": "The rain had followed Geralt for three days. It was thin rather than violent, the sort that slipped through leather one patient drop at a time and made even silence feel damp.",
+        "zh": "這場雨已經跟了傑洛特三天。它並不猛烈，而是細細密密，一滴一滴有耐心地滲過皮革，濕得彷彿連沉默都帶著水氣。"
+      },
+      {
+        "type": "dialogue",
+        "en": "“Don’t look at me like that,” Geralt told Roach. “I didn’t summon it.”",
+        "zh": "「別那樣看我。」傑洛特對蘿蔔說，「又不是我把雨叫來的。」"
+      },
+      {
+        "type": "narration",
+        "en": "Roach flicked one ear backward. Geralt chose to interpret this as criticism, mostly because there was no one else nearby to provide any.",
+        "zh": "蘿蔔把一隻耳朵往後撇了撇。傑洛特決定把這理解成責備，主要是因為附近實在沒有別人能負責這件事。"
+      },
+      {
+        "type": "dialogue",
+        "en": "“Fine. We’re both miserable.”",
+        "zh": "「好吧。我們兩個都很慘。」"
+      },
+      {
+        "type": "narration",
+        "en": "Near dusk, a village appeared between dripping birches. No smoke rose from its chimneys. No dogs barked at the road. Geralt slowed the mare before he had consciously decided to.",
+        "zh": "接近黃昏時，一座村子從滴著水的白樺林間浮現。煙囪沒有冒煙，路邊也沒有狗吠。傑洛特甚至還沒真正做出決定，便已讓母馬慢下腳步。"
+      },
+      {
+        "type": "dialogue",
+        "en": "“There,” he murmured. “That’s the sort of quiet that usually costs money.”",
+        "zh": "「就是那裡。」他低聲說，「這種安靜通常都很花錢。」"
+      }
+    ]
+  }
+]
