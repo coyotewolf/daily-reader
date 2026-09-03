@@ -36,9 +36,9 @@ async function ensureStoryContent(story) {
 }
 
 function contextualHintText() {
-  if (state.uiLocale === "zh-Hans") return "长按英文单词：先翻译整句，再按语境找出这个词的对应意思";
-  if (state.uiLocale === "zh-Hant") return "長按英文單字：先翻譯整句，再依語境找出這個詞的對應意思";
-  return "Long-press an English word for a sentence-aware contextual translation";
+  if (state.uiLocale === "zh-Hans") return "长按英文单词可按语境查看对应意思";
+  if (state.uiLocale === "zh-Hant") return "長按英文單字可依語境查看對應意思";
+  return "Long-press an English word for its meaning in context";
 }
 
 async function renderStory(bookSlug, storySlug) {
@@ -100,55 +100,29 @@ async function renderStory(bookSlug, storySlug) {
 }
 
 // Context-aware word lookup -------------------------------------------------
-// Instead of translating an isolated word, the lookup translates the entire
-// sentence with the selected word marked. The translated marker is then used
-// as a lightweight alignment signal to recover the word's meaning in context.
+// The full sentence is translated internally so the selected word can be
+// aligned to its context-specific Chinese meaning. Only that word meaning is
+// ever shown in the popup; the sentence translation stays internal.
 
-const CONTEXT_CACHE_KEY = "pathnotes-context-cache-v2";
+const CONTEXT_CACHE_KEY = "pathnotes-context-cache-v3";
 let contextLookupSerial = 0;
 let contextualLongPress = null;
 
 function lookupLabels() {
   if (state.uiLocale === "zh-Hans") {
-    return { sentence: "整句", approximate: "约", unavailable: "无法可靠对齐这个词" };
+    return { approximate: "约", unavailable: "无法可靠判断这个词义" };
   }
   if (state.uiLocale === "zh-Hant") {
-    return { sentence: "整句", approximate: "約", unavailable: "無法可靠對齊這個詞" };
+    return { approximate: "約", unavailable: "無法可靠判斷這個詞義" };
   }
-  return { sentence: "Sentence", approximate: "Approx.", unavailable: "Could not reliably align this word" };
+  return { approximate: "Approx.", unavailable: "Could not reliably determine this meaning" };
 }
 
-function ensureContextLine() {
-  if (!wordPopup) return null;
-  let line = wordPopup.querySelector(".word-popup-context");
-  if (!line) {
-    line = document.createElement("small");
-    line.className = "word-popup-context";
-    wordPopup.appendChild(line);
-  }
-  return line;
-}
-
-(function installContextPopupStyle() {
+(function installContextLookupStyle() {
   if (document.querySelector("#context-lookup-style")) return;
   const style = document.createElement("style");
   style.id = "context-lookup-style";
-  style.textContent = `
-    .word-popup .word-popup-context {
-      display: block;
-      margin-top: 7px;
-      padding-top: 7px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      font-size: 10px;
-      font-weight: 450;
-      line-height: 1.45;
-      white-space: normal;
-      max-width: 255px;
-    }
-    .lookup-word.context-pressed { background: var(--accent-soft); }
-  `;
+  style.textContent = `.lookup-word.context-pressed { background: var(--accent-soft); }`;
   document.head.appendChild(style);
 })();
 
@@ -176,10 +150,10 @@ function readContextCache() {
 
 function writeContextCache(cache) {
   try {
-    const entries = Object.entries(cache).slice(-250);
+    const entries = Object.entries(cache).slice(-300);
     localStorage.setItem(CONTEXT_CACHE_KEY, JSON.stringify(Object.fromEntries(entries)));
   } catch {
-    // Ignore private-mode/quota errors.
+    // Ignore private-mode/quota failures.
   }
 }
 
@@ -301,9 +275,8 @@ function extractMarkedMeaning(translated, markerPairs) {
     if (end === -1) continue;
 
     const meaning = translated.slice(start + open.length, end).trim();
-    const sentenceTranslation = `${translated.slice(0, start)}${meaning}${translated.slice(end + close.length)}`.trim();
     if (meaning && /[\u3400-\u9fff]/.test(meaning)) {
-      return { meaning, sentenceTranslation, aligned: true };
+      return { meaning, aligned: true };
     }
   }
   return null;
@@ -320,8 +293,6 @@ async function fetchContextualWordTranslation(wordElement) {
   const key = `${target}:${normalizeLookupWord(word)}:${contextHash(sentence)}`;
   if (cache[key]) return cache[key];
 
-  // First choice: uncommon brackets tend to survive MT while allowing the
-  // word inside them to be translated normally.
   const markedPrimary = markWordInSentence(context, "⟦", "⟧");
   const primaryTranslation = await translateContextText(markedPrimary);
   let result = extractMarkedMeaning(primaryTranslation, [
@@ -330,8 +301,6 @@ async function fetchContextualWordTranslation(wordElement) {
     ["[", "]"]
   ]);
 
-  // Some translation engines strip uncommon punctuation. Retry with ordinary
-  // square brackets before falling back to an approximate dictionary meaning.
   if (!result) {
     const markedSecondary = markWordInSentence(context, "[", "]");
     const secondaryTranslation = await translateContextText(markedSecondary);
@@ -343,10 +312,12 @@ async function fetchContextualWordTranslation(wordElement) {
   }
 
   if (!result) {
-    const sentenceTranslation = await translateContextText(sentence);
+    // Translate the unmarked whole sentence as an internal contextual pass.
+    // We deliberately do not expose that sentence translation to the UI.
+    await translateContextText(sentence);
+
     const local = localWordTranslation(word);
     let fallback = local;
-
     if (!fallback) {
       try {
         fallback = await fetchWordTranslation(word);
@@ -357,12 +328,10 @@ async function fetchContextualWordTranslation(wordElement) {
 
     result = {
       meaning: fallback || lookupLabels().unavailable,
-      sentenceTranslation,
       aligned: false
     };
   }
 
-  result.sourceSentence = sentence;
   cache[key] = result;
   writeContextCache(cache);
   return result;
@@ -374,13 +343,14 @@ async function showContextualWordTranslation(wordElement) {
   if (!word.trim()) return;
 
   const serial = ++contextLookupSerial;
-  const contextLine = ensureContextLine();
   const labels = lookupLabels();
 
   wordPopup.hidden = false;
   wordPopupSource.textContent = word;
   wordPopupTranslation.textContent = t("translating");
-  if (contextLine) contextLine.textContent = "";
+
+  // Remove any context line left behind by an older cached page/script version.
+  wordPopup.querySelector(".word-popup-context")?.remove();
   positionWordPopup(wordElement);
 
   try {
@@ -390,15 +360,10 @@ async function showContextualWordTranslation(wordElement) {
     wordPopupTranslation.textContent = result.aligned
       ? result.meaning
       : `${labels.approximate} ${result.meaning}`;
-
-    if (contextLine && result.sentenceTranslation) {
-      contextLine.textContent = `${labels.sentence}：${result.sentenceTranslation}`;
-    }
   } catch (error) {
     console.warn("Contextual lookup failed:", error);
     if (serial !== contextLookupSerial || wordPopupSource.textContent !== word) return;
     wordPopupTranslation.textContent = t("translationUnavailable");
-    if (contextLine) contextLine.textContent = "";
   }
 
   positionWordPopup(wordElement);
@@ -411,8 +376,6 @@ function clearContextualLongPress() {
   contextualLongPress = null;
 }
 
-// Capture-phase handlers intentionally run before the old isolated-word
-// handlers in app.js, so long-press now always uses sentence context.
 document.addEventListener("pointerdown", event => {
   const word = event.target.closest?.(".lookup-word");
   if (!word) return;
