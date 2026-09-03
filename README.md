@@ -1,62 +1,99 @@
 # Path Notes
 
-A mobile-first bilingual daily-story reader designed for GitHub Pages.
+A mobile-first bilingual serial-fiction reader for GitHub Pages.
 
-## Features
+## Current reading format
 
-- English only / 中文 only / bilingual display
-- Font size controls from 80% to 170%
-- Light / dark mode
-- Reader preferences saved in the browser
-- Mobile-first responsive layout
-- No framework, database, or build step
-- GitHub Pages deployment workflow included
+Each published chapter is rendered in this order:
 
-## Add a new story
+1. Chapter title
+2. Previously / 前情提要
+3. Full English text
+4. Full Chinese translation
 
-Edit `data/stories.json` and append a new object:
+The reader supports English-only, Chinese-only, and bilingual modes. Font-size controls apply to the story body **and** the Previously section. UI language follows the device/browser system language independently from story-language mode.
+
+## English word lookup
+
+Long-press an English word in the title, Previously section, or English story text to show a quick Chinese translation above the word.
+
+Lookup order:
+
+1. The chapter's local `glossary` when an entry is available.
+2. Cached translations already stored in the browser.
+3. Online single-word lookup for words not already cached.
+
+A failed lookup never blocks the reader.
+
+## Daily publication schema
+
+Book/chapter metadata lives in `data/stories.json`. A chapter entry has this shape:
 
 ```json
 {
-  "episode": 2,
-  "date": "2026-09-05",
-  "slug": "your-story-slug",
+  "episode": 3,
+  "publishedAt": "2026-09-04",
+  "slug": "chapter-slug",
   "title": {
-    "en": "English Title",
-    "zh": "中文標題"
+    "en": "English chapter title",
+    "zhHant": "繁體中文章名",
+    "zhHans": "简体中文章名"
   },
-  "excerpt": "Short description.",
-  "recap": "English recap for the previous episode.",
-  "ending": "The Path continues tomorrow.",
-  "paragraphs": [
-    {
-      "type": "narration",
-      "en": "English paragraph.",
-      "zh": "中文翻譯。"
-    },
-    {
-      "type": "dialogue",
-      "en": "“Dialogue.”",
-      "zh": "「對話。」"
-    }
+  "recap": {
+    "en": "English Previously text.",
+    "zh": "繁體中文前情提要。"
+  },
+  "contentFile": "./data/chapter-03-content.json.gz.b64",
+  "glossary": {
+    "example": "例子、範例。"
+  }
+}
+```
+
+The full story text is stored separately so the library index remains small. The decoded chapter content is:
+
+```json
+{
+  "en": [
+    "First English paragraph.",
+    "Second English paragraph."
+  ],
+  "zh": [
+    "第一段中文翻譯。",
+    "第二段中文翻譯。"
   ]
 }
 ```
 
-`type` can be `narration` or `dialogue`.
+The content JSON is gzip-compressed and then stored as Base64 text in the chapter's `contentFile`.
 
-## Deploy
+## Publishing a new daily chapter
 
-The included `.github/workflows/pages.yml` deploys the repository as a GitHub Pages site whenever `main` changes.
+For every new daily Witcher installment:
 
-If GitHub Pages is not enabled automatically on the first workflow run, open **Settings → Pages → Build and deployment → Source** and choose **GitHub Actions**, then rerun the workflow.
+- keep the actual publication date in `publishedAt`;
+- preserve the English chapter title and English Previously recap;
+- store the full English story as ordered paragraphs;
+- store the complete Traditional Chinese translation as ordered paragraphs;
+- add useful known vocabulary to `glossary` when available;
+- add the chapter metadata to the correct book in `data/stories.json`;
+- commit to `main`.
+
+GitHub Pages deploys automatically after the commit. This means future daily stories can be published without changing the website code—only chapter data/content needs to be added.
+
+## Existing imported serial
+
+The recovered full chapter currently imported is:
+
+- Chapter Two — **The Thing That Knows Your Name**
+- Publication date: **2026-08-30**
+
+The earlier short demo chapter is no longer the canonical serial format.
 
 ## Local preview
-
-Because the site loads `data/stories.json` with `fetch`, use a tiny local HTTP server rather than opening `index.html` directly:
 
 ```bash
 python -m http.server 8080
 ```
 
-Then visit `http://localhost:8080`.
+Then open `http://localhost:8080`.
