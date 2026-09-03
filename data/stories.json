@@ -3,15 +3,24 @@
     {
       "slug": "witcher-path-notes",
       "volume": 1,
-      "coverTitle": "PATH NOTES",
-      "coverMark": "THE CONTINENT",
+      "coverTitle": {
+        "en": "PATH NOTES",
+        "zh": "旅途札記"
+      },
+      "coverMark": {
+        "en": "THE CONTINENT",
+        "zh": "大陸"
+      },
       "coverTheme": "ember",
       "title": {
         "en": "The Witcher: Path Notes",
         "zh": "獵魔士：旅途札記"
       },
-      "description": "Geralt travels the roads of the Continent between familiar events, one quiet contract and human choice at a time.",
-      "status": "連載中",
+      "description": {
+        "en": "Geralt travels the roads of the Continent between familiar events, one quiet contract and human choice at a time.",
+        "zh": "傑洛特行走於大陸的道路，在熟悉事件之間，一次次面對不起眼的委託與人的選擇。"
+      },
+      "status": "ongoing",
       "chapters": [
         {
           "episode": 1,
