@@ -1,51 +1,51 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#11110f" />
   <meta name="description" content="A mobile-first bilingual reading library." />
-  <title>Path Notes｜雙語閱讀書庫</title>
+  <title>Path Notes</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./library.css" />
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#/" aria-label="回到書架">
+    <a class="brand" href="#/" data-i18n-aria="backShelf">
       <span class="brand-mark" aria-hidden="true">☽</span>
       <span>
         <strong>Path Notes</strong>
-        <small>雙語閱讀書庫</small>
+        <small data-i18n="librarySubtitle">Bilingual Reading Library</small>
       </span>
     </a>
-    <button id="themeToggle" class="icon-button" type="button" aria-label="切換夜間模式" title="切換夜間模式">◐</button>
+    <button id="themeToggle" class="icon-button" type="button">◐</button>
   </header>
 
   <main id="app" class="app-shell" aria-live="polite"></main>
 
-  <aside class="reader-tools" aria-label="閱讀設定">
-    <div class="segmented" role="group" aria-label="語言顯示">
+  <aside class="reader-tools" data-i18n-aria="readerSettings">
+    <div class="segmented" role="group" data-i18n-aria="contentLanguage">
       <button type="button" data-lang="en">EN</button>
       <button type="button" data-lang="zh">中</button>
-      <button type="button" data-lang="both" class="active">雙語</button>
+      <button type="button" data-lang="both" class="active" data-i18n="both">Both</button>
     </div>
     <div class="font-tools">
-      <button id="fontDown" type="button" aria-label="縮小字體">A−</button>
+      <button id="fontDown" type="button" data-i18n-aria="fontSmaller">A−</button>
       <span id="fontSizeLabel" aria-live="polite">100%</span>
-      <button id="fontUp" type="button" aria-label="放大字體">A＋</button>
+      <button id="fontUp" type="button" data-i18n-aria="fontLarger">A＋</button>
     </div>
   </aside>
 
   <template id="shelfTemplate">
     <section class="hero shelf-hero">
-      <p class="eyebrow">MY LIBRARY</p>
-      <h1>書架</h1>
-      <p>選一本書開始閱讀。每本書都有自己的目錄與連續章節。</p>
+      <p class="eyebrow" data-i18n="shelfEyebrow">MY LIBRARY</p>
+      <h1 data-i18n="shelfTitle">Library</h1>
+      <p data-i18n="shelfDescription">Choose a book to start reading. Each book has its own table of contents and continuous chapters.</p>
     </section>
     <section>
       <div class="section-heading">
-        <h2>所有書籍</h2>
+        <h2 data-i18n="allBooks">All books</h2>
         <span id="bookCount" class="muted"></span>
       </div>
       <div id="bookShelf" class="book-shelf"></div>
@@ -54,13 +54,13 @@
 
   <template id="bookTemplate">
     <article class="book-page">
-      <a class="back-link" href="#/">← 回到書架</a>
+      <a class="back-link" href="#/" data-i18n="backShelf">← Back to library</a>
       <header class="book-hero">
         <div id="largeBookCover" class="book-cover large-cover" aria-hidden="true">
           <span id="bookCoverKicker"></span>
           <div class="cover-emblem">✦</div>
           <strong id="bookCoverTitle"></strong>
-          <small id="bookCoverMark">PATH NOTES</small>
+          <small id="bookCoverMark"></small>
         </div>
         <div class="book-info">
           <div class="book-title-line">
@@ -68,22 +68,22 @@
             <span id="bookStatus" class="status-chip"></span>
           </div>
           <h1 id="bookTitle"></h1>
-          <p id="bookSubtitle" class="story-subtitle"></p>
+          <p id="bookSubtitle" class="story-subtitle" hidden></p>
           <p id="bookDescription" class="book-description"></p>
           <div class="book-stats detailed-stats">
-            <span><strong id="chapterCount"></strong> 章已發布</span>
-            <span>最後更新 <strong id="bookLastUpdated"></strong></span>
+            <span id="publishedChaptersStat"></span>
+            <span id="lastUpdatedStat"></span>
           </div>
           <div id="bookProgress" class="book-progress" hidden>
-            <div class="progress-copy"><span>連載進度</span><strong id="bookProgressLabel"></strong></div>
+            <div class="progress-copy"><span data-i18n="publicationProgress">Publication progress</span><strong id="bookProgressLabel"></strong></div>
             <div class="progress-track"><span id="bookProgressBar"></span></div>
           </div>
         </div>
       </header>
       <section class="toc-section">
         <div class="section-heading">
-          <h2>目錄</h2>
-          <span class="muted">Contents</span>
+          <h2 data-i18n="contents">Contents</h2>
+          <span class="muted" data-i18n="chapters">Chapters</span>
         </div>
         <div id="chapterList" class="chapter-list"></div>
       </section>
@@ -92,23 +92,23 @@
 
   <template id="readerTemplate">
     <article class="reader">
-      <a id="backToBook" class="back-link" href="#/">← 回到目錄</a>
+      <a id="backToBook" class="back-link" href="#/" data-i18n="backContents">← Back to contents</a>
       <header class="story-header">
         <p id="storyMeta" class="eyebrow"></p>
         <h1 id="storyTitle"></h1>
-        <p id="storySubtitle" class="story-subtitle"></p>
+        <p id="storySubtitle" class="story-subtitle" hidden></p>
       </header>
       <section id="recapBox" class="recap-box">
-        <span>Previously</span>
+        <span data-i18n="previously">Previously</span>
         <p id="storyRecap"></p>
       </section>
       <div id="storyBody" class="story-body"></div>
       <footer class="story-footer">
         <div>
-          <span class="muted">閱讀完畢</span>
+          <span class="muted" data-i18n="readingComplete">Finished</span>
           <strong id="endingLine">The Path continues tomorrow.</strong>
         </div>
-        <a id="footerBackToBook" href="#/" class="soft-button">回到目錄</a>
+        <a id="footerBackToBook" href="#/" class="soft-button" data-i18n="backContents">Back to contents</a>
       </footer>
     </article>
   </template>
