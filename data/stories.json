@@ -2,8 +2,10 @@
   "books": [
     {
       "slug": "witcher-path-notes",
-      "kicker": "BOOK ONE",
+      "volume": 1,
       "coverTitle": "PATH NOTES",
+      "coverMark": "THE CONTINENT",
+      "coverTheme": "ember",
       "title": {
         "en": "The Witcher: Path Notes",
         "zh": "獵魔士：旅途札記"
