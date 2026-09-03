@@ -38,12 +38,29 @@ function escapeHTML(value = "") {
 }
 
 function formatDate(dateString) {
+  if (!dateString) return "—";
   const date = new Date(`${dateString}T00:00:00`);
   return new Intl.DateTimeFormat("zh-Hant", { year: "numeric", month: "short", day: "numeric" }).format(date);
 }
 
 function findBook(slug) {
   return state.books.find(book => book.slug === slug);
+}
+
+function getLastUpdated(book) {
+  if (!book?.chapters?.length) return null;
+  return [...book.chapters].map(chapter => chapter.date).filter(Boolean).sort().at(-1) || null;
+}
+
+function getProgress(book) {
+  const current = book.chapters?.length || 0;
+  const total = Number(book.plannedChapters || 0);
+  if (!total || total < current) return null;
+  return { current, total, percent: Math.min(100, Math.round((current / total) * 100)) };
+}
+
+function coverTheme(book, index = 0) {
+  return book.coverTheme || ["ember", "forest", "steel", "night"][index % 4];
 }
 
 function setReaderMode(active) {
@@ -60,21 +77,35 @@ function renderShelf() {
     shelf.innerHTML = '<div class="empty-state">書架目前是空的。</div>';
   } else {
     state.books.forEach((book, index) => {
+      const lastUpdated = getLastUpdated(book);
+      const progress = getProgress(book);
       const link = document.createElement("a");
       link.className = "book-card";
       link.href = `#/book/${encodeURIComponent(book.slug)}`;
       link.innerHTML = `
-        <div class="book-cover" aria-hidden="true">
-          <span>${escapeHTML(book.kicker || `BOOK ${index + 1}`)}</span>
+        <div class="book-cover theme-${escapeHTML(coverTheme(book, index))}" aria-hidden="true">
+          <span>VOL. ${String(book.volume || index + 1).padStart(2, "0")}</span>
+          <div class="cover-emblem">✦</div>
           <strong>${escapeHTML(book.coverTitle || book.title.en)}</strong>
-          <small>PATH NOTES</small>
+          <small>${escapeHTML(book.coverMark || "PATH NOTES")}</small>
         </div>
         <div class="book-card-copy">
-          <p class="eyebrow">${escapeHTML(book.kicker || `BOOK ${index + 1}`)}</p>
+          <div class="book-card-topline">
+            <p class="eyebrow">VOLUME ${escapeHTML(book.volume || index + 1)}</p>
+            <span class="status-chip">${escapeHTML(book.status || "連載中")}</span>
+          </div>
           <h2>${escapeHTML(book.title.en)}</h2>
           <p class="book-zh">${escapeHTML(book.title.zh)}</p>
           <p>${escapeHTML(book.description || "")}</p>
-          <span class="book-meta">${book.chapters.length} 章 · ${escapeHTML(book.status || "連載中")}</span>
+          <div class="shelf-meta">
+            <span>${book.chapters.length} 章已發布</span>
+            <span>${lastUpdated ? `更新 ${escapeHTML(formatDate(lastUpdated))}` : "尚未更新"}</span>
+          </div>
+          ${progress ? `
+            <div class="mini-progress" aria-label="連載進度 ${progress.percent}%">
+              <span style="width:${progress.percent}%"></span>
+            </div>
+            <div class="mini-progress-label">${progress.current} / ${progress.total} 章 · ${progress.percent}%</div>` : ""}
         </div>`;
       shelf.appendChild(link);
     });
@@ -90,15 +121,29 @@ function renderBook(bookSlug) {
   const book = findBook(bookSlug);
   if (!book) return renderNotFound("找不到這本書。");
 
+  const bookIndex = Math.max(0, state.books.indexOf(book));
+  const lastUpdated = getLastUpdated(book);
+  const progress = getProgress(book);
   const fragment = document.querySelector("#bookTemplate").content.cloneNode(true);
-  fragment.querySelector("#bookKicker").textContent = book.kicker || "BOOK";
+
+  fragment.querySelector("#bookKicker").textContent = `VOLUME ${book.volume || bookIndex + 1}`;
   fragment.querySelector("#bookTitle").textContent = book.title.en;
   fragment.querySelector("#bookSubtitle").textContent = book.title.zh;
   fragment.querySelector("#bookDescription").textContent = book.description || "";
   fragment.querySelector("#chapterCount").textContent = book.chapters.length;
   fragment.querySelector("#bookStatus").textContent = book.status || "連載中";
-  fragment.querySelector("#bookCoverKicker").textContent = book.kicker || "BOOK";
+  fragment.querySelector("#bookLastUpdated").textContent = formatDate(lastUpdated);
+  fragment.querySelector("#bookCoverKicker").textContent = `VOL. ${String(book.volume || bookIndex + 1).padStart(2, "0")}`;
   fragment.querySelector("#bookCoverTitle").textContent = book.coverTitle || book.title.en;
+  fragment.querySelector("#bookCoverMark").textContent = book.coverMark || "PATH NOTES";
+  fragment.querySelector("#largeBookCover").classList.add(`theme-${coverTheme(book, bookIndex)}`);
+
+  if (progress) {
+    const progressBox = fragment.querySelector("#bookProgress");
+    progressBox.hidden = false;
+    fragment.querySelector("#bookProgressLabel").textContent = `${progress.current} / ${progress.total} · ${progress.percent}%`;
+    fragment.querySelector("#bookProgressBar").style.width = `${progress.percent}%`;
+  }
 
   const list = fragment.querySelector("#chapterList");
   [...book.chapters]
@@ -202,8 +247,10 @@ async function boot() {
     const data = await response.json();
     state.books = Array.isArray(data) ? [{
       slug: "witcher-path-notes",
-      kicker: "BOOK ONE",
+      volume: 1,
       coverTitle: "PATH NOTES",
+      coverMark: "THE CONTINENT",
+      coverTheme: "ember",
       title: { en: "The Witcher: Path Notes", zh: "獵魔士：旅途札記" },
       description: "Geralt travels the roads of the Continent between familiar events, one quiet contract and human choice at a time.",
       status: "連載中",
