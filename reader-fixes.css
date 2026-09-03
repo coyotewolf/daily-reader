@@ -1,6 +1,5 @@
 :root { --reader-line-height: 1.85; }
 
-/* Reading text spacing */
 .story-body,
 .story-pair .en,
 .story-pair .zh,
@@ -10,28 +9,18 @@
 .story-pair .en,
 .story-pair .zh { margin: 0 !important; }
 .story-pair .zh { margin-top: .42em !important; }
-
 :root[data-language="both"] .story-pair { margin-bottom: 1.55em !important; }
 :root[data-language="both"] .story-pair .zh { margin-top: .5em !important; }
 
-/* Translation popup follows the reader font scale. */
-.word-popup strong {
-  font-size: clamp(12px, calc(var(--reader-size) * .78), 18px) !important;
-}
-.word-popup span {
-  font-size: clamp(12px, calc(var(--reader-size) * .72), 17px) !important;
-  line-height: 1.5 !important;
-}
+.word-popup strong { font-size: clamp(12px, calc(var(--reader-size) * .78), 18px) !important; }
+.word-popup span { font-size: clamp(12px, calc(var(--reader-size) * .72), 17px) !important; line-height: 1.5 !important; }
 
-/* Avoid native long-press selection competing with word lookup. */
-body,
-body * {
+body, body * {
   -webkit-user-select: none !important;
   user-select: none !important;
   -webkit-touch-callout: none !important;
 }
 
-/* Bottom controls: readable, responsive separation between function groups. */
 .reader-tools {
   justify-content: space-between !important;
   gap: clamp(7px, 2.2vw, 18px) !important;
@@ -40,69 +29,50 @@ body * {
 }
 .reader-tools .segmented,
 .reader-tools .font-tools,
-.reader-tools .line-tools {
-  gap: 2px !important;
-  flex: 0 1 auto !important;
-}
+.reader-tools .line-tools { gap: 2px !important; flex: 0 1 auto !important; }
 .reader-tools .font-tools,
-.reader-tools .line-tools {
-  padding-left: clamp(4px, 1vw, 9px);
-  border-left: 1px solid var(--line);
-}
+.reader-tools .line-tools { padding-left: clamp(4px, 1vw, 9px); border-left: 1px solid var(--line); }
 
-/* Top and bottom chrome animate outward instead of blinking away. */
 body.is-reader .topbar,
 body.is-reader .reader-tools {
+  visibility: visible !important;
   transition: transform .28s cubic-bezier(.2,.75,.25,1), opacity .24s ease !important;
   will-change: transform, opacity;
 }
 body.is-reader.reader-chrome-hidden .topbar {
+  visibility: visible !important;
   transform: translateY(calc(-100% - 12px)) !important;
   opacity: 0 !important;
   pointer-events: none !important;
 }
 body.is-reader.reader-chrome-hidden .reader-tools {
+  visibility: visible !important;
   transform: translateY(calc(100% + 30px)) !important;
   opacity: 0 !important;
   pointer-events: none !important;
 }
 body.is-reader:not(.reader-chrome-hidden) .topbar,
 body.is-reader:not(.reader-chrome-hidden) .reader-tools {
+  visibility: visible !important;
   transform: translateY(0) !important;
   opacity: 1 !important;
 }
 
-/* Footer previous/next replaces Back to contents, using the same soft-button language. */
 .chapter-footer { display: block !important; }
-.footer-chapter-nav {
-  display: grid;
-  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
-  gap: 12px;
-  width: 100%;
-}
-.footer-chapter-button {
-  display: flex !important;
-  min-height: 46px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-.footer-chapter-button.previous { justify-self: stretch; }
-.footer-chapter-button.next { justify-self: stretch; }
-.footer-nav-spacer { min-width: 0; }
+.footer-chapter-nav { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; width:100%; }
+.footer-chapter-button { display:flex !important; min-height:46px; align-items:center; justify-content:center; text-align:center; justify-self:stretch; }
+.footer-nav-spacer { min-width:0; }
+.chapter-navigation { display:none !important; }
 
-/* Old injected chapter cards are no longer used. */
-.chapter-navigation { display: none !important; }
-
-@media (max-width: 420px) {
-  .reader-tools { gap: 5px !important; padding-inline: 5px !important; }
+@media (max-width:420px) {
+  .reader-tools { gap:5px !important; padding-inline:5px !important; }
   .reader-tools .font-tools,
-  .reader-tools .line-tools { padding-left: 4px; }
-  .footer-chapter-nav { gap: 8px; }
-  .footer-chapter-button { padding-inline: 10px !important; font-size: 12px; }
+  .reader-tools .line-tools { padding-left:4px; }
+  .footer-chapter-nav { gap:8px; }
+  .footer-chapter-button { padding-inline:10px !important; font-size:12px; }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion:reduce) {
   body.is-reader .topbar,
-  body.is-reader .reader-tools { transition: none !important; }
+  body.is-reader .reader-tools { transition:none !important; }
 }
