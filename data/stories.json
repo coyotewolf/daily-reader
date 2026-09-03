@@ -5,71 +5,61 @@
       "volume": 1,
       "coverTitle": {
         "en": "PATH NOTES",
-        "zh": "旅途札記",
+        "zhHant": "旅途札記",
         "zhHans": "旅途札记"
       },
       "coverMark": {
         "en": "THE CONTINENT",
-        "zh": "大陸",
+        "zhHant": "大陸",
         "zhHans": "大陆"
       },
       "coverTheme": "ember",
       "title": {
         "en": "The Witcher: Path Notes",
-        "zh": "獵魔士：旅途札記",
+        "zhHant": "獵魔士：旅途札記",
         "zhHans": "猎魔士：旅途札记"
       },
       "description": {
         "en": "Geralt travels the roads of the Continent between familiar events, one quiet contract and human choice at a time.",
-        "zh": "傑洛特行走於大陸的道路，在熟悉事件之間，一次次面對不起眼的委託與人的選擇。",
-        "zhHans": "杰洛特行走于大陆的道路，在熟悉事件之间，一次次面对不起眼的委托与人的选择。"
+        "zhHant": "傑洛特行走於大陸的道路，在原作事件之間的空隙裡，經歷一份份委託與一個個人的選擇。",
+        "zhHans": "杰洛特行走于大陆的道路，在原作事件之间的空隙里，经历一份份委托与一个个人的选择。"
       },
       "status": "ongoing",
       "chapters": [
         {
-          "episode": 1,
-          "date": "2026-09-04",
-          "slug": "rain-on-the-pontar-road",
+          "episode": 2,
+          "publishedAt": "2026-08-30",
+          "slug": "the-thing-that-knows-your-name",
           "title": {
-            "en": "Rain on the Pontar Road",
-            "zh": "龐塔爾河畔的雨",
-            "zhHans": "庞塔尔河畔的雨"
+            "en": "Chapter Two — The Thing That Knows Your Name",
+            "zhHant": "第二章——知道你名字的東西",
+            "zhHans": "第二章——知道你名字的东西"
           },
-          "excerpt": "A wet road, a tired witcher, and one village that is far too quiet.",
-          "recap": "Geralt has been riding south beneath three days of cold rain, looking for little more than a dry stable, a hot meal, and a few hours without trouble.",
-          "ending": "Some roads end at an inn. Others begin there.",
-          "paragraphs": [
-            {
-              "type": "narration",
-              "en": "The rain had followed Geralt for three days. It was thin rather than violent, the sort that slipped through leather one patient drop at a time and made even silence feel damp.",
-              "zh": "這場雨已經跟了傑洛特三天。它並不猛烈，而是細細密密，一滴一滴有耐心地滲過皮革，濕得彷彿連沉默都帶著水氣。"
-            },
-            {
-              "type": "dialogue",
-              "en": "“Don’t look at me like that,” Geralt told Roach. “I didn’t summon it.”",
-              "zh": "「別那樣看我。」傑洛特對蘿蔔說，「又不是我把雨叫來的。」"
-            },
-            {
-              "type": "narration",
-              "en": "Roach flicked one ear backward. Geralt chose to interpret this as criticism, mostly because there was no one else nearby to provide any.",
-              "zh": "蘿蔔把一隻耳朵往後撇了撇。傑洛特決定把這理解成責備，主要是因為附近實在沒有別人能負責這件事。"
-            },
-            {
-              "type": "dialogue",
-              "en": "“Fine. We’re both miserable.”",
-              "zh": "「好吧。我們兩個都很慘。」"
-            },
-            {
-              "type": "narration",
-              "en": "Near dusk, a village appeared between dripping birches. No smoke rose from its chimneys. No dogs barked at the road. Geralt slowed the mare before he had consciously decided to.",
-              "zh": "接近黃昏時，一座村子從滴著水的白樺林間浮現。煙囪沒有冒煙，路邊也沒有狗吠。傑洛特甚至還沒真正做出決定，便已讓母馬慢下腳步。"
-            },
-            {
-              "type": "dialogue",
-              "en": "“There,” he murmured. “That’s the sort of quiet that usually costs money.”",
-              "zh": "「就是那裡。」他低聲說，「這種安靜通常都很花錢。」"
-            }
-          ]
+          "recap": {
+            "en": "Geralt stopped in the village of Ravelin after learning that dogs had been found hanging from trees with their hearts removed. In the alder grove, he discovered ritual markings, traces of magic, and a voice that could imitate a frightened child. Then it spoke his full name.",
+            "zh": "Geralt 在 Ravelin 村停留，得知當地的狗被吊在樹上，而且心臟遭到取走。他在赤楊樹林裡發現了儀式性的符號、魔法痕跡，以及一個能模仿受驚孩童聲音的東西。接著，那個聲音叫出了他的全名。"
+          },
+          "contentFile": "./data/chapter-02-content.json.gz.b64",
+          "glossary": {
+            "universal law": "普遍法則、幾乎到處都成立的規律。",
+            "swallowed by moss": "被苔蘚吞沒；形容建築幾乎被植物覆蓋。",
+            "hinge": "鉸鏈；torn from its hinges 指門被硬生生從鉸鏈上扯下。",
+            "hellebore": "嚏根草，一類帶毒性的植物。",
+            "deliberate": "刻意的、有意為之的。",
+            "figure of speech": "修辭說法、不是字面意思的說法。",
+            "at an impossible angle": "以不可能的角度。",
+            "lunge": "猛撲、突然衝向前。",
+            "rake across": "抓劃而過。",
+            "unstable": "不穩定的。",
+            "plastered against": "因雨水或汗水而緊貼在……上。",
+            "starved": "極度消瘦、長期挨餓的。",
+            "notation": "記號、符號系統。",
+            "anchor": "錨；此處指固定、束縛某種東西的媒介。",
+            "haul someone upright": "費力把某人拉起來。",
+            "competing theories": "彼此競爭、互相矛盾的理論。",
+            "neutrality": "中立。",
+            "precisely": "正是、恰恰。"
+          }
         }
       ]
     }
