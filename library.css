@@ -1,0 +1,218 @@
+.book-card {
+  position: relative;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.book-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -30% -65% 40%;
+  height: 170px;
+  background: radial-gradient(circle, var(--accent-soft), transparent 68%);
+  pointer-events: none;
+}
+
+.book-cover {
+  aspect-ratio: 2 / 3;
+  min-height: 0;
+  isolation: isolate;
+}
+
+.book-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 72% 24%, rgba(255,255,255,.12), transparent 17%),
+    linear-gradient(115deg, transparent 0 47%, rgba(255,255,255,.035) 48% 49%, transparent 50% 100%);
+}
+
+.book-cover.theme-ember {
+  background: linear-gradient(150deg, #171513 0%, #38231e 58%, #8a452e 100%);
+}
+
+.book-cover.theme-forest {
+  background: linear-gradient(150deg, #111815 0%, #263c31 60%, #48634e 100%);
+}
+
+.book-cover.theme-steel {
+  background: linear-gradient(150deg, #17191c 0%, #363b42 60%, #6c747c 100%);
+}
+
+.book-cover.theme-night {
+  background: linear-gradient(150deg, #11121a 0%, #24263b 60%, #4a466c 100%);
+}
+
+.cover-emblem {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  align-self: center;
+  border: 1px solid rgba(240,232,216,.35);
+  border-radius: 50%;
+  color: rgba(240,232,216,.88);
+  font-size: 15px;
+  transform: rotate(45deg);
+}
+
+.cover-emblem::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgba(240,232,216,.16);
+  border-radius: 50%;
+}
+
+.book-card-topline,
+.book-title-line,
+.shelf-meta,
+.progress-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.book-card-topline .eyebrow,
+.book-title-line .eyebrow {
+  margin: 0;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.shelf-meta {
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+}
+
+.mini-progress,
+.progress-track {
+  overflow: hidden;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+
+.mini-progress {
+  margin-top: 10px;
+}
+
+.mini-progress > span,
+.progress-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.mini-progress-label {
+  margin-top: 5px;
+  color: var(--muted);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 9px;
+  text-align: right;
+}
+
+.detailed-stats {
+  margin-top: 20px;
+}
+
+.detailed-stats strong {
+  font-weight: 700;
+}
+
+.book-progress {
+  margin-top: 18px;
+  padding: 14px 15px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+}
+
+.book-progress[hidden] {
+  display: none;
+}
+
+.progress-copy {
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 10px;
+}
+
+.progress-copy strong {
+  color: var(--text);
+}
+
+.large-cover .cover-emblem {
+  width: 62px;
+  height: 62px;
+  font-size: 20px;
+}
+
+@media (hover: hover) {
+  .book-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 24%, var(--line));
+  }
+}
+
+@media (max-width: 640px) {
+  .book-card {
+    grid-template-columns: 106px minmax(0, 1fr);
+  }
+
+  .book-cover {
+    min-height: 159px;
+  }
+
+  .cover-emblem {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .book-card-copy > p:not(.eyebrow):not(.book-zh) {
+    -webkit-line-clamp: 2;
+  }
+
+  .shelf-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .book-title-line {
+    align-items: flex-start;
+  }
+
+  .detailed-stats {
+    grid-column: 1 / -1;
+  }
+
+  .book-progress {
+    grid-column: 1 / -1;
+  }
+}
