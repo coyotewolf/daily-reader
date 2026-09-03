@@ -10,128 +10,29 @@
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./library.css" />
   <link rel="stylesheet" href="./reader-extras.css" />
+  <link rel="stylesheet" href="./reader-fixes.css" />
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#/" data-i18n-aria="backShelf">
-      <span class="brand-mark" aria-hidden="true">☽</span>
-      <span>
-        <strong>Path Notes</strong>
-        <small data-i18n="librarySubtitle">Bilingual Reading Library</small>
-      </span>
-    </a>
+    <a class="brand" href="#/" data-i18n-aria="backShelf"><span class="brand-mark" aria-hidden="true">☽</span><span><strong>Path Notes</strong><small data-i18n="librarySubtitle">Bilingual Reading Library</small></span></a>
     <button id="themeToggle" class="icon-button" type="button">◐</button>
   </header>
-
   <main id="app" class="app-shell" aria-live="polite"></main>
-
   <aside class="reader-tools" data-i18n-aria="readerSettings">
-    <div class="segmented" role="group" data-i18n-aria="contentLanguage">
-      <button type="button" data-lang="en">EN</button>
-      <button type="button" data-lang="zh">中</button>
-      <button type="button" data-lang="both" class="active" data-i18n="both">Both</button>
-    </div>
-    <div class="font-tools">
-      <button id="fontDown" type="button" data-i18n-aria="fontSmaller">A−</button>
-      <span id="fontSizeLabel" aria-live="polite">100%</span>
-      <button id="fontUp" type="button" data-i18n-aria="fontLarger">A＋</button>
-    </div>
-    <div class="line-tools" role="group" aria-label="Line spacing">
-      <button id="lineHeightDown" type="button">↕−</button>
-      <span id="lineHeightLabel" aria-live="polite">1.65</span>
-      <button id="lineHeightUp" type="button">↕＋</button>
-    </div>
+    <div class="segmented" role="group" data-i18n-aria="contentLanguage"><button type="button" data-lang="en">EN</button><button type="button" data-lang="zh">中</button><button type="button" data-lang="both" class="active" data-i18n="both">Both</button></div>
+    <div class="font-tools"><button id="fontDown" type="button" data-i18n-aria="fontSmaller">A−</button><span id="fontSizeLabel" aria-live="polite">80%</span><button id="fontUp" type="button" data-i18n-aria="fontLarger">A＋</button></div>
+    <div class="line-tools" role="group" aria-label="Line spacing"><button id="lineHeightDown" type="button">↕−</button><span id="lineHeightLabel" aria-live="polite">1.85</span><button id="lineHeightUp" type="button">↕＋</button></div>
   </aside>
+  <div id="wordPopup" class="word-popup" role="status" aria-live="polite" hidden><strong id="wordPopupSource"></strong><span id="wordPopupTranslation"></span></div>
 
-  <div id="wordPopup" class="word-popup" role="status" aria-live="polite" hidden>
-    <strong id="wordPopupSource"></strong>
-    <span id="wordPopupTranslation"></span>
-  </div>
+  <template id="shelfTemplate"><section class="hero shelf-hero"><p class="eyebrow" data-i18n="shelfEyebrow">MY LIBRARY</p><h1 data-i18n="shelfTitle">Library</h1><p data-i18n="shelfDescription">Choose a book to start reading. Each book has its own table of contents and continuous chapters.</p></section><section><div class="section-heading"><h2 data-i18n="allBooks">All books</h2><span id="bookCount" class="muted"></span></div><div id="bookShelf" class="book-shelf"></div></section></template>
 
-  <template id="shelfTemplate">
-    <section class="hero shelf-hero">
-      <p class="eyebrow" data-i18n="shelfEyebrow">MY LIBRARY</p>
-      <h1 data-i18n="shelfTitle">Library</h1>
-      <p data-i18n="shelfDescription">Choose a book to start reading. Each book has its own table of contents and continuous chapters.</p>
-    </section>
-    <section>
-      <div class="section-heading">
-        <h2 data-i18n="allBooks">All books</h2>
-        <span id="bookCount" class="muted"></span>
-      </div>
-      <div id="bookShelf" class="book-shelf"></div>
-    </section>
-  </template>
+  <template id="bookTemplate"><article class="book-page"><a class="back-link" href="#/" data-i18n="backShelf">← Back to library</a><header class="book-hero"><div id="largeBookCover" class="book-cover large-cover" aria-hidden="true"><span id="bookCoverKicker"></span><div class="cover-emblem">✦</div><strong id="bookCoverTitle"></strong><small id="bookCoverMark"></small></div><div class="book-info"><div class="book-title-line"><p id="bookKicker" class="eyebrow"></p><span id="bookStatus" class="status-chip"></span></div><h1 id="bookTitle"></h1><p id="bookDescription" class="book-description"></p><div class="book-stats detailed-stats"><span id="publishedChaptersStat"></span><span id="lastUpdatedStat"></span></div><div id="bookProgress" class="book-progress" hidden><div class="progress-copy"><span data-i18n="publicationProgress">Publication progress</span><strong id="bookProgressLabel"></strong></div><div class="progress-track"><span id="bookProgressBar"></span></div></div></div></header><section class="toc-section"><div class="section-heading"><h2 data-i18n="contents">Contents</h2><span class="muted" data-i18n="chapters">Chapters</span></div><div id="chapterList" class="chapter-list"></div></section></article></template>
 
-  <template id="bookTemplate">
-    <article class="book-page">
-      <a class="back-link" href="#/" data-i18n="backShelf">← Back to library</a>
-      <header class="book-hero">
-        <div id="largeBookCover" class="book-cover large-cover" aria-hidden="true">
-          <span id="bookCoverKicker"></span>
-          <div class="cover-emblem">✦</div>
-          <strong id="bookCoverTitle"></strong>
-          <small id="bookCoverMark"></small>
-        </div>
-        <div class="book-info">
-          <div class="book-title-line">
-            <p id="bookKicker" class="eyebrow"></p>
-            <span id="bookStatus" class="status-chip"></span>
-          </div>
-          <h1 id="bookTitle"></h1>
-          <p id="bookDescription" class="book-description"></p>
-          <div class="book-stats detailed-stats">
-            <span id="publishedChaptersStat"></span>
-            <span id="lastUpdatedStat"></span>
-          </div>
-          <div id="bookProgress" class="book-progress" hidden>
-            <div class="progress-copy"><span data-i18n="publicationProgress">Publication progress</span><strong id="bookProgressLabel"></strong></div>
-            <div class="progress-track"><span id="bookProgressBar"></span></div>
-          </div>
-        </div>
-      </header>
-      <section class="toc-section">
-        <div class="section-heading">
-          <h2 data-i18n="contents">Contents</h2>
-          <span class="muted" data-i18n="chapters">Chapters</span>
-        </div>
-        <div id="chapterList" class="chapter-list"></div>
-      </section>
-    </article>
-  </template>
-
-  <template id="readerTemplate">
-    <article class="reader">
-      <a id="backToBook" class="back-link" href="#/" data-i18n="backContents">← Back to contents</a>
-
-      <header class="story-header">
-        <p id="storyMeta" class="eyebrow"></p>
-        <h1 id="storyTitleEn" class="content-en"></h1>
-        <h1 id="storyTitleZh" class="content-zh story-title-zh"></h1>
-      </header>
-
-      <section id="recapBox" class="recap-box">
-        <span data-i18n="previously">Previously</span>
-        <div class="recap-content">
-          <p id="storyRecapEn" class="content-en" lang="en"></p>
-          <p id="storyRecapZh" class="content-zh recap-zh" lang="zh-Hant"></p>
-        </div>
-      </section>
-
-      <p class="word-hint content-en" data-i18n="wordHint">Long-press an English word for a quick translation</p>
-
-      <div id="storyBody" class="story-body serial-body"></div>
-
-      <footer class="story-footer">
-        <div>
-          <span class="muted" data-i18n="readingComplete">Finished</span>
-        </div>
-        <a id="footerBackToBook" href="#/" class="soft-button" data-i18n="backContents">Back to contents</a>
-      </footer>
-    </article>
-  </template>
+  <template id="readerTemplate"><article class="reader"><a id="backToBook" class="back-link" href="#/" data-i18n="backContents">← Back to contents</a><header class="story-header"><p id="storyMeta" class="eyebrow"></p><h1 id="storyTitleEn" class="content-en"></h1><h1 id="storyTitleZh" class="content-zh story-title-zh"></h1></header><section id="recapBox" class="recap-box"><span data-i18n="previously">Previously</span><div class="recap-content"><p id="storyRecapEn" class="content-en" lang="en"></p><p id="storyRecapZh" class="content-zh recap-zh" lang="zh-Hant"></p></div></section><p class="word-hint content-en" data-i18n="wordHint">Long-press an English word for a quick translation</p><div id="storyBody" class="story-body serial-body"></div><footer class="story-footer"><div><span class="muted" data-i18n="readingComplete">Finished</span></div><a id="footerBackToBook" href="#/" class="soft-button" data-i18n="backContents">Back to contents</a></footer></article></template>
 
   <script src="./app.js" defer></script>
+  <script src="./reader-defaults.js" defer></script>
   <script src="./reader-v2.js" defer></script>
   <script src="./reader-parts.js" defer></script>
   <script src="./reader-pairs.js" defer></script>
