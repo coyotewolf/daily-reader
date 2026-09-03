@@ -34,6 +34,12 @@ const translations = {
     lastUpdated: "Last updated {date}",
     progressLabel: "{current} / {total} chapters · {percent}%",
     chapterNumber: "CHAPTER {n}",
+    publishedOn: "Published {date}",
+    englishText: "English",
+    chineseTranslation: "Chinese translation",
+    translating: "Translating…",
+    translationUnavailable: "Translation unavailable",
+    wordHint: "Long-press an English word for a quick translation",
     docLibrary: "Path Notes | Bilingual Reading Library"
   },
   "zh-Hant": {
@@ -71,6 +77,12 @@ const translations = {
     lastUpdated: "最後更新 {date}",
     progressLabel: "{current} / {total} 章 · {percent}%",
     chapterNumber: "第 {n} 章",
+    publishedOn: "發布於 {date}",
+    englishText: "英文全文",
+    chineseTranslation: "中文翻譯",
+    translating: "翻譯中…",
+    translationUnavailable: "暫時無法取得翻譯",
+    wordHint: "長按英文單字可查看基本翻譯",
     docLibrary: "Path Notes｜雙語閱讀書庫"
   },
   "zh-Hans": {
@@ -108,6 +120,12 @@ const translations = {
     lastUpdated: "最后更新 {date}",
     progressLabel: "{current} / {total} 章 · {percent}%",
     chapterNumber: "第 {n} 章",
+    publishedOn: "发布于 {date}",
+    englishText: "英文全文",
+    chineseTranslation: "中文翻译",
+    translating: "翻译中…",
+    translationUnavailable: "暂时无法取得翻译",
+    wordHint: "长按英文单词可查看基本翻译",
     docLibrary: "Path Notes｜双语阅读书库"
   }
 };
@@ -126,13 +144,17 @@ const state = {
   theme: localStorage.getItem("pathnotes-theme") || (
     window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
   ),
-  fontScale: Number(localStorage.getItem("pathnotes-font") || "1")
+  fontScale: Number(localStorage.getItem("pathnotes-font") || "1"),
+  activeStory: null
 };
 
 const app = document.querySelector("#app");
 const root = document.documentElement;
 const themeToggle = document.querySelector("#themeToggle");
 const fontSizeLabel = document.querySelector("#fontSizeLabel");
+const wordPopup = document.querySelector("#wordPopup");
+const wordPopupSource = document.querySelector("#wordPopupSource");
+const wordPopupTranslation = document.querySelector("#wordPopupTranslation");
 
 function t(key, params = {}) {
   const table = translations[state.uiLocale] || translations.en;
@@ -164,11 +186,11 @@ function statusText(status) {
   if (typeof status === "object") return localizedValue(status);
   const aliases = {
     ongoing: "ongoing", "連載中": "ongoing", "连载中": "ongoing",
-    completed: "completed", "已完結": "completed", "已完结": "completed", "完結": "completed", "完结": "completed",
+    completed: "completed", "已完結": "completed", "已完结": "completed",
     hiatus: "hiatus", "暫停連載": "hiatus", "暂停连载": "hiatus"
   };
-  const key = aliases[status] || status;
-  return translations.en[key] ? t(key) : String(status || t("ongoing"));
+  const key = aliases[status] || status || "ongoing";
+  return translations.en[key] ? t(key) : String(status);
 }
 
 function applySettings() {
@@ -177,11 +199,13 @@ function applySettings() {
   root.lang = state.uiLocale;
   root.style.setProperty("--reader-size", `${19 * state.fontScale}px`);
   fontSizeLabel.textContent = `${Math.round(state.fontScale * 100)}%`;
+
   document.querySelectorAll("[data-lang]").forEach(btn => {
     const active = btn.dataset.lang === state.language;
     btn.classList.toggle("active", active);
     btn.setAttribute("aria-pressed", String(active));
   });
+
   translateTree(document);
   themeToggle.textContent = state.theme === "dark" ? "☀" : "◐";
   const themeLabel = state.theme === "dark" ? t("themeToLight") : t("themeToDark");
@@ -201,6 +225,23 @@ function escapeHTML(value = "") {
   }[char]));
 }
 
+function tokenizeEnglish(text = "") {
+  const source = String(text);
+  const wordRegex = /[A-Za-z]+(?:['’][A-Za-z]+)*/g;
+  let html = "";
+  let cursor = 0;
+  let match;
+
+  while ((match = wordRegex.exec(source)) !== null) {
+    html += escapeHTML(source.slice(cursor, match.index));
+    const word = match[0];
+    html += `<span class="lookup-word" data-word="${escapeHTML(word)}">${escapeHTML(word)}</span>`;
+    cursor = match.index + word.length;
+  }
+  html += escapeHTML(source.slice(cursor));
+  return html;
+}
+
 function formatDate(dateString) {
   if (!dateString) return "—";
   const date = new Date(`${dateString}T00:00:00`);
@@ -209,13 +250,17 @@ function formatDate(dateString) {
   }).format(date);
 }
 
+function chapterDate(chapter) {
+  return chapter.publishedAt || chapter.date || null;
+}
+
 function findBook(slug) {
   return state.books.find(book => book.slug === slug);
 }
 
 function getLastUpdated(book) {
   if (!book?.chapters?.length) return null;
-  return [...book.chapters].map(chapter => chapter.date).filter(Boolean).sort().at(-1) || null;
+  return [...book.chapters].map(chapterDate).filter(Boolean).sort().at(-1) || null;
 }
 
 function getProgress(book) {
@@ -231,6 +276,10 @@ function coverTheme(book, index = 0) {
 
 function setReaderMode(active) {
   document.body.classList.toggle("is-reader", active);
+  if (!active) {
+    state.activeStory = null;
+    hideWordPopup();
+  }
 }
 
 function renderShelf() {
@@ -325,6 +374,7 @@ function renderBook(bookSlug) {
   [...book.chapters]
     .sort((a, b) => a.episode - b.episode)
     .forEach(chapter => {
+      const publishedAt = chapterDate(chapter);
       const link = document.createElement("a");
       link.className = "chapter-row";
       link.href = `#/book/${encodeURIComponent(book.slug)}/story/${encodeURIComponent(chapter.slug)}`;
@@ -332,7 +382,7 @@ function renderBook(bookSlug) {
         <div class="chapter-number">${String(chapter.episode).padStart(2, "0")}</div>
         <div class="chapter-copy">
           <h3>${escapeHTML(localizedValue(chapter.title))}</h3>
-          <small>${escapeHTML(formatDate(chapter.date))}</small>
+          <small>${escapeHTML(t("publishedOn", { date: formatDate(publishedAt) }))}</small>
         </div>
         <span class="arrow" aria-hidden="true">→</span>`;
       list.appendChild(link);
@@ -350,22 +400,40 @@ function renderStory(bookSlug, storySlug) {
   if (!story) return renderNotFound("chapterNotFound");
 
   setReaderMode(true);
+  state.activeStory = story;
   const fragment = document.querySelector("#readerTemplate").content.cloneNode(true);
   translateTree(fragment);
+
   const tocHref = `#/book/${encodeURIComponent(book.slug)}`;
   fragment.querySelector("#backToBook").href = tocHref;
   fragment.querySelector("#footerBackToBook").href = tocHref;
-  fragment.querySelector("#storyMeta").textContent = `${localizedValue(book.title)} · ${t("chapterNumber", { n: String(story.episode).padStart(2, "0") })} · ${formatDate(story.date)}`;
-  fragment.querySelector("#storyTitle").textContent = localizedValue(story.title);
-  fragment.querySelector("#storyRecap").textContent = story.recap || "A new road begins.";
-  fragment.querySelector("#endingLine").textContent = story.ending || "The Path continues tomorrow.";
 
-  const body = fragment.querySelector("#storyBody");
-  story.paragraphs.forEach(paragraph => {
-    const pair = document.createElement("div");
-    pair.className = `story-pair${paragraph.type === "dialogue" ? " dialogue" : ""}`;
-    pair.innerHTML = `<p class="en" lang="en">${escapeHTML(paragraph.en)}</p><p class="zh" lang="zh-Hant">${escapeHTML(paragraph.zh)}</p>`;
-    body.appendChild(pair);
+  const publishedAt = chapterDate(story);
+  fragment.querySelector("#storyMeta").textContent =
+    `${t("chapterNumber", { n: story.episode })} · ${t("publishedOn", { date: formatDate(publishedAt) })}`;
+
+  const titleEn = fragment.querySelector("#storyTitleEn");
+  titleEn.innerHTML = tokenizeEnglish(story.title?.en || "");
+  fragment.querySelector("#storyTitleZh").textContent = story.title?.zh || story.title?.zhHant || "";
+
+  const recapEn = fragment.querySelector("#storyRecapEn");
+  recapEn.innerHTML = tokenizeEnglish(story.recap?.en || "");
+  fragment.querySelector("#storyRecapZh").textContent = story.recap?.zh || story.recap?.zhHant || "";
+
+  const englishBody = fragment.querySelector("#englishBody");
+  (story.content?.en || story.paragraphs?.map(p => p.en).filter(Boolean) || []).forEach(paragraph => {
+    const p = document.createElement("p");
+    p.className = "story-paragraph";
+    p.innerHTML = tokenizeEnglish(paragraph);
+    englishBody.appendChild(p);
+  });
+
+  const chineseBody = fragment.querySelector("#chineseBody");
+  (story.content?.zh || story.paragraphs?.map(p => p.zh).filter(Boolean) || []).forEach(paragraph => {
+    const p = document.createElement("p");
+    p.className = "story-paragraph";
+    p.textContent = paragraph;
+    chineseBody.appendChild(p);
   });
 
   app.replaceChildren(fragment);
@@ -375,10 +443,11 @@ function renderStory(bookSlug, storySlug) {
 
 function renderNotFound(key) {
   setReaderMode(false);
-  app.innerHTML = `<div class="empty-state">${escapeHTML(t(key))}<br><br><a href="#/">${escapeHTML(t("backShelf"))}</a></div>`;
+  app.innerHTML = `<div class="empty-state">${escapeHTML(t(key))}<br><br><a href="#/">${escapeHTML(t("backShelf").replace(/^←\s*/, ""))}</a></div>`;
 }
 
 function route() {
+  hideWordPopup();
   const storyMatch = location.hash.match(/^#\/book\/([^/]+)\/story\/(.+)$/);
   if (storyMatch) return renderStory(decodeURIComponent(storyMatch[1]), decodeURIComponent(storyMatch[2]));
   const bookMatch = location.hash.match(/^#\/book\/(.+)$/);
@@ -386,11 +455,210 @@ function route() {
   renderShelf();
 }
 
+function normalizeLookupWord(word) {
+  return String(word || "")
+    .trim()
+    .replace(/^['’]+|['’]+$/g, "")
+    .toLowerCase();
+}
+
+const builtinGlossary = {
+  geralt: "傑洛特（人名）",
+  yennefer: "葉奈法（人名）",
+  dandelion: "丹德里恩（人名）",
+  ravelin: "拉維林（地名）",
+  witcher: "獵魔士",
+  medallion: "徽章；護符",
+  silver: "銀；銀製的",
+  sword: "劍",
+  magic: "魔法",
+  specter: "幽靈；鬼魂",
+  cursed: "受詛咒的",
+  blood: "血",
+  fear: "恐懼",
+  rain: "雨",
+  village: "村莊",
+  scholar: "學者",
+  ruin: "廢墟",
+  alder: "赤楊",
+  oak: "橡樹"
+};
+
+function cacheKeyForWord(word) {
+  return `${state.uiLocale === "zh-Hans" ? "zh-CN" : "zh-TW"}:${normalizeLookupWord(word)}`;
+}
+
+function readTranslationCache() {
+  try {
+    return JSON.parse(localStorage.getItem("pathnotes-word-cache-v1") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function writeTranslationCache(cache) {
+  try {
+    const entries = Object.entries(cache).slice(-400);
+    localStorage.setItem("pathnotes-word-cache-v1", JSON.stringify(Object.fromEntries(entries)));
+  } catch {
+    // Ignore storage quota/privacy mode failures.
+  }
+}
+
+function localWordTranslation(word) {
+  const normalized = normalizeLookupWord(word);
+  const storyGlossary = state.activeStory?.glossary || {};
+  if (storyGlossary[normalized]) return storyGlossary[normalized];
+
+  for (const [term, translation] of Object.entries(storyGlossary)) {
+    if (!term.includes(" ") && normalized === term.toLowerCase()) return translation;
+  }
+  return builtinGlossary[normalized] || null;
+}
+
+async function fetchWordTranslation(word) {
+  const local = localWordTranslation(word);
+  if (local) return local;
+
+  const cache = readTranslationCache();
+  const key = cacheKeyForWord(word);
+  if (cache[key]) return cache[key];
+
+  const target = state.uiLocale === "zh-Hans" ? "zh-CN" : "zh-TW";
+  const url = new URL("https://api.mymemory.translated.net/get");
+  url.searchParams.set("q", word);
+  url.searchParams.set("langpair", `en|${target}`);
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6500);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    let translated = String(data?.responseData?.translatedText || "").trim();
+
+    if (!translated && Array.isArray(data?.matches)) {
+      translated = String(data.matches.find(item => item?.translation)?.translation || "").trim();
+    }
+
+    if (!translated) throw new Error("No translation");
+    cache[key] = translated;
+    writeTranslationCache(cache);
+    return translated;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function positionWordPopup(wordElement) {
+  if (!wordPopup || wordPopup.hidden) return;
+  const rect = wordElement.getBoundingClientRect();
+  const popupRect = wordPopup.getBoundingClientRect();
+  const margin = 10;
+  let left = rect.left + rect.width / 2 - popupRect.width / 2;
+  left = Math.max(margin, Math.min(left, window.innerWidth - popupRect.width - margin));
+
+  let top = rect.top - popupRect.height - 10;
+  wordPopup.dataset.placement = "top";
+  if (top < margin) {
+    top = rect.bottom + 10;
+    wordPopup.dataset.placement = "bottom";
+  }
+
+  wordPopup.style.left = `${Math.round(left)}px`;
+  wordPopup.style.top = `${Math.round(top)}px`;
+}
+
+async function showWordTranslation(wordElement) {
+  if (!wordElement) return;
+  const word = wordElement.dataset.word || wordElement.textContent || "";
+  if (!word.trim()) return;
+
+  wordPopup.hidden = false;
+  wordPopupSource.textContent = word;
+  wordPopupTranslation.textContent = t("translating");
+  positionWordPopup(wordElement);
+
+  try {
+    const translation = await fetchWordTranslation(word);
+    if (wordPopupSource.textContent !== word) return;
+    wordPopupTranslation.textContent = translation;
+  } catch {
+    if (wordPopupSource.textContent !== word) return;
+    wordPopupTranslation.textContent = t("translationUnavailable");
+  }
+  positionWordPopup(wordElement);
+}
+
+function hideWordPopup() {
+  if (!wordPopup) return;
+  wordPopup.hidden = true;
+  wordPopupSource.textContent = "";
+  wordPopupTranslation.textContent = "";
+}
+
+let longPress = null;
+
+document.addEventListener("pointerdown", event => {
+  const word = event.target.closest?.(".lookup-word");
+  if (!word) {
+    if (!event.target.closest?.("#wordPopup")) hideWordPopup();
+    return;
+  }
+  if (event.pointerType === "mouse" && event.button !== 0) return;
+
+  longPress = {
+    word,
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    fired: false,
+    timer: setTimeout(() => {
+      if (!longPress || longPress.word !== word) return;
+      longPress.fired = true;
+      showWordTranslation(word);
+      if (navigator.vibrate) navigator.vibrate(8);
+    }, 520)
+  };
+});
+
+document.addEventListener("pointermove", event => {
+  if (!longPress || event.pointerId !== longPress.pointerId) return;
+  if (Math.hypot(event.clientX - longPress.x, event.clientY - longPress.y) > 10) {
+    clearTimeout(longPress.timer);
+    longPress = null;
+  }
+});
+
+["pointerup", "pointercancel"].forEach(type => {
+  document.addEventListener(type, event => {
+    if (!longPress || event.pointerId !== longPress.pointerId) return;
+    clearTimeout(longPress.timer);
+    longPress = null;
+  });
+});
+
+document.addEventListener("contextmenu", event => {
+  const word = event.target.closest?.(".lookup-word");
+  if (!word) return;
+  event.preventDefault();
+  showWordTranslation(word);
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") hideWordPopup();
+});
+
+window.addEventListener("scroll", hideWordPopup, { passive: true });
+window.addEventListener("resize", hideWordPopup);
+
 document.querySelectorAll("[data-lang]").forEach(button => {
   button.addEventListener("click", () => {
     state.language = button.dataset.lang;
     saveSettings();
     applySettings();
+    hideWordPopup();
   });
 });
 
@@ -404,17 +672,21 @@ document.querySelector("#fontDown").addEventListener("click", () => {
   state.fontScale = Math.max(.8, Math.round((state.fontScale - .1) * 10) / 10);
   saveSettings();
   applySettings();
+  hideWordPopup();
 });
 
 document.querySelector("#fontUp").addEventListener("click", () => {
   state.fontScale = Math.min(1.7, Math.round((state.fontScale + .1) * 10) / 10);
   saveSettings();
   applySettings();
+  hideWordPopup();
 });
 
 window.addEventListener("hashchange", route);
 window.addEventListener("languagechange", () => {
-  state.uiLocale = detectSystemLocale();
+  const nextLocale = detectSystemLocale();
+  if (nextLocale === state.uiLocale) return;
+  state.uiLocale = nextLocale;
   applySettings();
   route();
 });
@@ -425,20 +697,7 @@ async function boot() {
     const response = await fetch("./data/stories.json", { cache: "no-store" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    state.books = Array.isArray(data) ? [{
-      slug: "witcher-path-notes",
-      volume: 1,
-      coverTitle: { en: "PATH NOTES", zh: "旅途札記" },
-      coverMark: { en: "THE CONTINENT", zh: "大陸" },
-      coverTheme: "ember",
-      title: { en: "The Witcher: Path Notes", zh: "獵魔士：旅途札記" },
-      description: {
-        en: "Geralt travels the roads of the Continent between familiar events, one quiet contract and human choice at a time.",
-        zh: "傑洛特行走於大陸的道路，在熟悉事件之間，一次次面對不起眼的委託與人的選擇。"
-      },
-      status: "ongoing",
-      chapters: data
-    }] : (data.books || []);
+    state.books = data.books || [];
   } catch (error) {
     console.error("Unable to load library:", error);
     state.books = [];
