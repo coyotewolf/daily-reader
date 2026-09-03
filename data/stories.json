@@ -23,7 +23,10 @@
             "en": "The story begins. Geralt of Rivia is traveling south of the Pontar when bad weather forces him to stop in the village of Ravelin, where a series of mutilated animals hints at something far stranger than wolves.",
             "zh": "故事就此揭幕。利維亞的傑洛特正沿著龐塔爾河以南一路前行，一場惡劣的風雨迫使他在拉維林村暫時落腳。然而，村中接連出現遭到殘忍肢解的動物屍體——種種跡象顯示，潛伏在附近的東西，恐怕遠比狼群更加詭異。"
           },
-          "contentFile": "./data/chapter-01-content.json.gz.b64",
+          "contentFileParts": [
+            "./data/chapter-01-content-01.b64part",
+            "./data/chapter-01-content-02.b64part"
+          ],
           "glossary": {}
         },
         {
@@ -61,7 +64,10 @@
             "en": "Back in Ravelin, Geralt learned that the presence in the grove could reach into memories and use the dead against the living. The village midwife, Edda, revealed that decades earlier a strange girl named Ilse had been studied by the healer Visenna before dying beneath the old manor. Among Visenna’s surviving notes, Geralt found a troubling reference to Elder Blood—and then heard his mother’s voice outside Edda’s door.",
             "zh": "回到 Ravelin 後，Geralt 發現樹林裡的存在能深入人的記憶，利用死者對付活人。村中的接生婆 Edda 告訴他，數十年前，一名叫 Ilse 的神祕女孩曾受到治療師 Visenna 的研究，最後死在舊莊園地下。Geralt 在 Visenna 遺留下來的筆記中發現一段令人不安的 Elder Blood 記載——接著，他在 Edda 門外聽見了母親的聲音。"
           },
-          "contentFile": "./data/chapter-04-content.json.gz.b64",
+          "contentFileParts": [
+            "./data/chapter-04-content-01.b64part",
+            "./data/chapter-04-content-02.b64part"
+          ],
           "glossary": {}
         },
         {
@@ -73,7 +79,10 @@
             "en": "Geralt burned Visenna’s notebook to break Ilse’s hold over Ravelin, freeing the villagers from a web of stolen memories. In the aftermath, Tomas admitted that he had been working for a mysterious man called Master Aven, who was collecting records on magical bloodlines and unusual inherited abilities. Geralt intended to leave at dawn. Ravelin, however, had other plans.",
             "zh": "Geralt 燒掉 Visenna 的筆記，打破 Ilse 對 Ravelin 的控制，將村民從被竊取記憶所構成的魔法網中解救出來。事後，Tomas 坦承自己曾替一名神祕男子 Master Aven 工作，對方正在收集與魔法血統及特殊遺傳能力有關的紀錄。Geralt 原本打算天亮便離開。然而，Ravelin 似乎另有安排。"
           },
-          "contentFile": "./data/chapter-05-content.json.gz.b64",
+          "contentFileParts": [
+            "./data/chapter-05-content-01.b64part",
+            "./data/chapter-05-content-02.b64part"
+          ],
           "glossary": {}
         },
         {
@@ -85,7 +94,10 @@
             "en": "Geralt and Tomas left Ravelin for Oxenfurt after learning that Master Aven had been collecting records on magical inheritance, unusual children, and broken family lines across the Northern Kingdoms. Tomas also revealed that Aven had searched old Cintran genealogies connected to several families—including Raven. Geralt now suspects that the false Elder Blood trail was created deliberately, and that someone wants researchers looking in the wrong direction.",
             "zh": "Geralt 和 Tomas 離開 Ravelin 前往 Oxenfurt，因為他們發現 Master Aven 一直在收集與魔法遺傳、異常孩童以及北方諸國中斷裂家族血統有關的紀錄。Tomas 同時透露，Aven 曾調查多份古老的 Cintra 家譜，其中包括 Raven。Geralt 如今開始懷疑，關於 Elder Blood 的錯誤線索是有人刻意製造的，而且有人希望研究者往錯誤方向追查。"
           },
-          "contentFile": "./data/chapter-06-content.json.gz.b64",
+          "contentFileParts": [
+            "./data/chapter-06-content-01.b64part",
+            "./data/chapter-06-content-02.b64part"
+          ],
           "glossary": {}
         }
       ]
