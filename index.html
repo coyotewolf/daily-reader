@@ -9,6 +9,7 @@
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./library.css" />
+  <link rel="stylesheet" href="./reader-extras.css" />
 </head>
 <body>
   <header class="topbar">
@@ -34,6 +35,11 @@
       <button id="fontDown" type="button" data-i18n-aria="fontSmaller">A−</button>
       <span id="fontSizeLabel" aria-live="polite">100%</span>
       <button id="fontUp" type="button" data-i18n-aria="fontLarger">A＋</button>
+    </div>
+    <div class="line-tools" role="group" aria-label="Line spacing">
+      <button id="lineHeightDown" type="button">↕−</button>
+      <span id="lineHeightLabel" aria-live="polite">1.65</span>
+      <button id="lineHeightUp" type="button">↕＋</button>
     </div>
   </aside>
 
@@ -128,5 +134,6 @@
   <script src="./app.js" defer></script>
   <script src="./reader-v2.js" defer></script>
   <script src="./reader-pairs.js" defer></script>
+  <script src="./reader-extras.js" defer></script>
 </body>
 </html>
