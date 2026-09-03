@@ -2,6 +2,7 @@ const LINE_HEIGHT_MIN = 1.35;
 const LINE_HEIGHT_MAX = 2.15;
 const LINE_HEIGHT_STEP = 0.1;
 const READER_CHROME_HIDE_DELAY = 4200;
+const READER_CONTROL_HOLD_MS = 4200;
 
 function readSavedLineHeight() {
   const saved = Number(localStorage.getItem("pathnotes-line-height") ?? "1.85");
@@ -11,13 +12,15 @@ function readSavedLineHeight() {
 
 let readerLineHeight = readSavedLineHeight();
 let readerChromeTimer = null;
+let readerChromeHoldUntil = 0;
+let readerChromeScrollAnchor = window.scrollY;
 
 function lineHeightLocaleText(kind) {
   const locale = state?.uiLocale || "en";
   const table = {
-    en: { down:"Decrease line spacing", up:"Increase line spacing", previous:"← Previous chapter", next:"Next chapter →" },
-    "zh-Hant": { down:"縮小行距", up:"放大行距", previous:"← 上一章", next:"下一章 →" },
-    "zh-Hans": { down:"缩小行距", up:"放大行距", previous:"← 上一章", next:"下一章 →" }
+    en: { down:"Decrease line spacing", up:"Increase line spacing", previous:"← Previous chapter", next:"Next chapter →", contents:"Back to contents" },
+    "zh-Hant": { down:"縮小行距", up:"放大行距", previous:"← 上一章", next:"下一章 →", contents:"回到目錄" },
+    "zh-Hans": { down:"缩小行距", up:"放大行距", previous:"← 上一章", next:"下一章 →", contents:"返回目录" }
   };
   return (table[locale] || table.en)[kind];
 }
@@ -37,6 +40,7 @@ function changeReaderLineHeight(delta) {
 }
 
 function chapterHref(book,chapter){return `#/book/${encodeURIComponent(book.slug)}/story/${encodeURIComponent(chapter.slug)}`;}
+function contentsHref(book){return `#/book/${encodeURIComponent(book.slug)}`;}
 
 function addFooterChapterNavigation(bookSlug,storySlug){
   const reader=document.querySelector(".reader"); if(!reader)return;
@@ -47,17 +51,39 @@ function addFooterChapterNavigation(bookSlug,storySlug){
   const footer=reader.querySelector(".story-footer"); if(!footer)return;
   footer.classList.add("chapter-footer"); footer.replaceChildren();
   const nav=document.createElement("nav"); nav.className="footer-chapter-nav"; nav.setAttribute("aria-label",state.uiLocale==="en"?"Chapter navigation":"章節導覽");
-  const make=(chapter,kind)=>{const a=document.createElement("a");a.className=`soft-button footer-chapter-button ${kind}`;a.href=chapterHref(book,chapter);a.textContent=lineHeightLocaleText(kind);return a;};
-  if(previous) nav.appendChild(make(previous,"previous")); else { const spacer=document.createElement("span"); spacer.className="footer-nav-spacer"; nav.appendChild(spacer); }
-  if(next) nav.appendChild(make(next,"next")); else { const spacer=document.createElement("span"); spacer.className="footer-nav-spacer"; nav.appendChild(spacer); }
+  const makeChapter=(chapter,kind)=>{const a=document.createElement("a");a.className=`soft-button footer-chapter-button ${kind}`;a.href=chapterHref(book,chapter);a.textContent=lineHeightLocaleText(kind);return a;};
+  const makeContents=(kind)=>{const a=document.createElement("a");a.className=`soft-button footer-chapter-button contents ${kind}`;a.href=contentsHref(book);a.textContent=lineHeightLocaleText("contents");return a;};
+
+  // First chapter: Back to contents | Next chapter.
+  // Last chapter: Previous chapter | Back to contents.
+  nav.appendChild(previous ? makeChapter(previous,"previous") : makeContents("previous"));
+  nav.appendChild(next ? makeChapter(next,"next") : makeContents("next"));
   footer.appendChild(nav);
 }
 
 function clearReaderChromeTimer(){if(readerChromeTimer!==null){clearTimeout(readerChromeTimer);readerChromeTimer=null;}}
 function isActualReaderPage(){return document.body.classList.contains("is-reader")&&Boolean(document.querySelector(".reader"));}
-function hideReaderChrome(){if(!isActualReaderPage())return;clearReaderChromeTimer();document.body.classList.add("reader-chrome-hidden");}
-function scheduleReaderChromeHide(delay=READER_CHROME_HIDE_DELAY){clearReaderChromeTimer();if(!isActualReaderPage())return;readerChromeTimer=setTimeout(()=>{if(isActualReaderPage())hideReaderChrome();},delay);}
-function showReaderChrome(autoHide=true){if(!isActualReaderPage())return;document.body.classList.remove("reader-chrome-hidden");if(autoHide)scheduleReaderChromeHide();}
+function chromeIsHeld(){return Date.now()<readerChromeHoldUntil;}
+function holdReaderChrome(duration=READER_CONTROL_HOLD_MS){readerChromeHoldUntil=Date.now()+duration;readerChromeScrollAnchor=window.scrollY;}
+function hideReaderChrome(force=false){
+  if(!isActualReaderPage())return;
+  if(!force&&chromeIsHeld())return;
+  clearReaderChromeTimer();
+  readerChromeHoldUntil=0;
+  document.body.classList.add("reader-chrome-hidden");
+}
+function scheduleReaderChromeHide(delay=READER_CHROME_HIDE_DELAY){
+  clearReaderChromeTimer(); if(!isActualReaderPage())return;
+  const remaining=Math.max(0,readerChromeHoldUntil-Date.now());
+  const actualDelay=Math.max(delay,remaining);
+  readerChromeTimer=setTimeout(()=>{if(isActualReaderPage()&&!chromeIsHeld())hideReaderChrome(true);},actualDelay);
+}
+function showReaderChrome(autoHide=true,hold=false){
+  if(!isActualReaderPage())return;
+  document.body.classList.remove("reader-chrome-hidden");
+  if(hold) holdReaderChrome();
+  if(autoHide)scheduleReaderChromeHide();
+}
 function isReaderChromeInteractiveTarget(target){return Boolean(target?.closest?.(".topbar, .reader-tools, a, button, input, select, textarea, .lookup-word, .word-popup"));}
 
 function syncReaderEnhancements(){
@@ -65,26 +91,42 @@ function syncReaderEnhancements(){
   const match=location.hash.match(/^#\/book\/([^/]+)\/story\/(.+)$/);
   if(match&&document.querySelector(".reader")){
     addFooterChapterNavigation(decodeURIComponent(match[1]),decodeURIComponent(match[2]));
+    readerChromeHoldUntil=0;
+    readerChromeScrollAnchor=window.scrollY;
     document.body.classList.remove("reader-chrome-hidden"); scheduleReaderChromeHide();
-  } else {clearReaderChromeTimer();document.body.classList.remove("reader-chrome-hidden");}
+  } else {clearReaderChromeTimer();readerChromeHoldUntil=0;document.body.classList.remove("reader-chrome-hidden");}
 }
 
-document.querySelector("#lineHeightDown")?.addEventListener("click",()=>{changeReaderLineHeight(-LINE_HEIGHT_STEP);showReaderChrome(true);});
-document.querySelector("#lineHeightUp")?.addEventListener("click",()=>{changeReaderLineHeight(LINE_HEIGHT_STEP);showReaderChrome(true);});
+function keepChromeAfterControl(){
+  showReaderChrome(true,true);
+}
 
-// Any interaction with the bottom bar keeps it visible; only timeout or
-// subsequent reading scroll hides it.
-document.querySelector(".reader-tools")?.addEventListener("pointerdown",()=>showReaderChrome(false),true);
-document.querySelector(".reader-tools")?.addEventListener("click",()=>showReaderChrome(true),true);
+document.querySelector("#lineHeightDown")?.addEventListener("click",()=>{changeReaderLineHeight(-LINE_HEIGHT_STEP);keepChromeAfterControl();});
+document.querySelector("#lineHeightUp")?.addEventListener("click",()=>{changeReaderLineHeight(LINE_HEIGHT_STEP);keepChromeAfterControl();});
+
+// Any interaction with the bottom bar holds it open. The hold is cancelled by
+// a real reading scroll, not by tiny focus/layout scrolls caused by tapping.
+document.querySelector(".reader-tools")?.addEventListener("pointerdown",()=>{showReaderChrome(false,true);},true);
+document.querySelector(".reader-tools")?.addEventListener("click",()=>{keepChromeAfterControl();},true);
 
 document.addEventListener("click",event=>{
   if(!isActualReaderPage())return;
+  if(event.target?.closest?.(".reader-tools")) return;
   if(isReaderChromeInteractiveTarget(event.target)){if(!document.body.classList.contains("reader-chrome-hidden"))scheduleReaderChromeHide();return;}
   showReaderChrome(true);
 },true);
 
-window.addEventListener("scroll",()=>{if(isActualReaderPage())hideReaderChrome();},{passive:true});
-document.addEventListener("touchmove",()=>{if(isActualReaderPage())hideReaderChrome();},{passive:true});
+window.addEventListener("scroll",()=>{
+  if(!isActualReaderPage())return;
+  const moved=Math.abs(window.scrollY-readerChromeScrollAnchor);
+  if(moved>12){readerChromeScrollAnchor=window.scrollY;hideReaderChrome(true);}
+},{passive:true});
+
+document.addEventListener("touchmove",event=>{
+  if(!isActualReaderPage())return;
+  if(event.target?.closest?.(".reader-tools"))return;
+  hideReaderChrome(true);
+},{passive:true});
 
 const readerObserver=new MutationObserver(()=>requestAnimationFrame(syncReaderEnhancements));
 readerObserver.observe(document.querySelector("#app"),{childList:true,subtree:false});
