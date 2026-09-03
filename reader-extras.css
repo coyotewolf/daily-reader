@@ -9,9 +9,11 @@
   line-height: var(--reader-line-height) !important;
 }
 
-/* Keep the serial visually continuous: no blank-line-sized gaps between units. */
-.story-pair {
-  margin: 0 0 .42em;
+/* No paragraph-sized blank rows inside chapter text. */
+.story-pair,
+.story-pair .en,
+.story-pair .zh {
+  margin: 0 !important;
 }
 
 .story-pair:empty,
@@ -19,19 +21,16 @@
   display: none !important;
 }
 
-.story-pair .en,
 .story-pair .zh {
-  margin-bottom: 0;
+  margin-top: 0 !important;
 }
 
-.story-pair .zh {
-  margin-top: .14em;
-}
-
-/* Reading controls must remain a single row on every viewport. */
+/* Keep all reading controls on exactly one compact row. */
 .reader-tools {
   flex-wrap: nowrap !important;
-  gap: 5px;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 2px !important;
   overflow: hidden;
 }
 
@@ -41,50 +40,67 @@
   display: flex;
   min-width: 0;
   align-items: center;
-  flex: 0 1 auto;
-  gap: 2px;
+  justify-content: center;
+  flex: 0 0 auto !important;
+  gap: 0 !important;
   white-space: nowrap;
-}
-
-.segmented {
-  flex: 1 1 auto;
 }
 
 .reader-tools button,
 .line-tools button {
-  min-width: 30px;
-  height: 36px;
-  padding: 0 6px;
-  flex: 0 1 auto;
+  box-sizing: border-box;
+  min-width: 27px !important;
+  width: auto;
+  height: 34px;
+  margin: 0 !important;
+  padding: 0 4px !important;
+  flex: 0 0 auto !important;
+  font-size: 12px;
+}
+
+.segmented button {
+  min-width: 29px !important;
 }
 
 #fontSizeLabel,
 #lineHeightLabel {
-  min-width: 32px;
+  display: inline-block;
+  min-width: 28px !important;
+  margin: 0 !important;
+  padding: 0 1px;
   text-align: center;
   color: var(--muted);
   font-family: ui-sans-serif, system-ui, sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-variant-numeric: tabular-nums;
 }
 
-/* Ebook-style reading chrome: hide top and bottom bars while reading. */
+/* Ebook-style chrome. Visibility is controlled by reader-extras.js. */
 body.is-reader .topbar,
 body.is-reader .reader-tools {
-  transition: transform .24s ease, opacity .2s ease;
+  transition: transform .22s ease, opacity .18s ease, visibility .22s step-start;
   will-change: transform, opacity;
 }
 
 body.is-reader.reader-chrome-hidden .topbar {
-  transform: translateY(calc(-100% - 8px));
-  opacity: 0;
-  pointer-events: none;
+  transform: translateY(calc(-100% - 10px)) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 body.is-reader.reader-chrome-hidden .reader-tools {
-  transform: translateY(calc(100% + 22px));
-  opacity: 0;
-  pointer-events: none;
+  transform: translateY(calc(100% + 28px)) !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.is-reader:not(.reader-chrome-hidden) .topbar,
+body.is-reader:not(.reader-chrome-hidden) .reader-tools {
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .chapter-navigation {
@@ -107,9 +123,7 @@ body.is-reader.reader-chrome-hidden .reader-tools {
   text-decoration: none;
 }
 
-.chapter-nav-link.next {
-  text-align: right;
-}
+.chapter-nav-link.next { text-align: right; }
 
 .chapter-nav-label {
   color: var(--accent);
@@ -129,71 +143,58 @@ body.is-reader.reader-chrome-hidden .reader-tools {
   white-space: nowrap;
 }
 
-.chapter-navigation.single-next {
-  grid-template-columns: 1fr;
-}
-
-.chapter-navigation.single-next .next {
-  grid-column: 1;
-}
+.chapter-navigation.single-next { grid-template-columns: 1fr; }
+.chapter-navigation.single-next .next { grid-column: 1; }
 
 @media (max-width: 640px) {
   .reader-tools {
-    width: calc(100% - 12px);
-    right: max(6px, env(safe-area-inset-right));
-    left: max(6px, env(safe-area-inset-left));
-    padding: 6px;
-    gap: 3px;
+    width: calc(100% - 8px) !important;
+    right: max(4px, env(safe-area-inset-right)) !important;
+    left: max(4px, env(safe-area-inset-left)) !important;
+    padding: 5px 3px !important;
+    gap: 1px !important;
   }
 
   .reader-tools button,
   .line-tools button {
-    min-width: 28px;
-    height: 34px;
-    padding: 0 4px;
-    font-size: 12px;
+    min-width: 25px !important;
+    height: 32px;
+    padding: 0 3px !important;
+    font-size: 11px;
   }
 
-  .segmented button {
-    min-width: 29px;
-  }
+  .segmented button { min-width: 27px !important; }
 
   #fontSizeLabel,
   #lineHeightLabel {
-    min-width: 29px;
-    font-size: 9px;
+    min-width: 26px !important;
+    font-size: 8.5px;
   }
 
-  .chapter-navigation {
-    grid-template-columns: 1fr;
-  }
-
-  .chapter-nav-link.next {
-    text-align: left;
-  }
+  .chapter-navigation { grid-template-columns: 1fr; }
+  .chapter-nav-link.next { text-align: left; }
 }
 
 @media (max-width: 360px) {
   .reader-tools {
-    gap: 2px;
-    padding: 5px;
+    padding-inline: 2px !important;
+    gap: 0 !important;
   }
 
   .reader-tools button,
   .line-tools button {
-    min-width: 26px;
-    padding: 0 3px;
-    font-size: 11px;
+    min-width: 23px !important;
+    padding-inline: 2px !important;
+    font-size: 10px;
   }
 
-  .segmented button {
-    min-width: 27px;
-  }
+  .segmented button { min-width: 25px !important; }
 
   #fontSizeLabel,
   #lineHeightLabel {
-    min-width: 27px;
-    font-size: 8.5px;
+    min-width: 24px !important;
+    padding-inline: 0;
+    font-size: 8px;
   }
 }
 
