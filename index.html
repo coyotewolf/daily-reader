@@ -55,19 +55,27 @@
     <article class="book-page">
       <a class="back-link" href="#/">← 回到書架</a>
       <header class="book-hero">
-        <div class="book-cover large-cover" aria-hidden="true">
+        <div id="largeBookCover" class="book-cover large-cover" aria-hidden="true">
           <span id="bookCoverKicker"></span>
+          <div class="cover-emblem">✦</div>
           <strong id="bookCoverTitle"></strong>
           <small id="bookCoverMark">PATH NOTES</small>
         </div>
         <div class="book-info">
-          <p id="bookKicker" class="eyebrow"></p>
+          <div class="book-title-line">
+            <p id="bookKicker" class="eyebrow"></p>
+            <span id="bookStatus" class="status-chip"></span>
+          </div>
           <h1 id="bookTitle"></h1>
           <p id="bookSubtitle" class="story-subtitle"></p>
           <p id="bookDescription" class="book-description"></p>
-          <div class="book-stats">
-            <span><strong id="chapterCount"></strong> 章</span>
-            <span id="bookStatus"></span>
+          <div class="book-stats detailed-stats">
+            <span><strong id="chapterCount"></strong> 章已發布</span>
+            <span>最後更新 <strong id="bookLastUpdated"></strong></span>
+          </div>
+          <div id="bookProgress" class="book-progress" hidden>
+            <div class="progress-copy"><span>連載進度</span><strong id="bookProgressLabel"></strong></div>
+            <div class="progress-track"><span id="bookProgressBar"></span></div>
           </div>
         </div>
       </header>
