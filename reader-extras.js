@@ -1,6 +1,7 @@
 const LINE_HEIGHT_MIN = 1.35;
 const LINE_HEIGHT_MAX = 2.05;
 const LINE_HEIGHT_STEP = 0.1;
+const READER_CHROME_HIDE_DELAY = 2500;
 
 function readSavedLineHeight() {
   const saved = Number(localStorage.getItem("pathnotes-line-height") || "1.65");
@@ -9,6 +10,7 @@ function readSavedLineHeight() {
 }
 
 let readerLineHeight = readSavedLineHeight();
+let readerChromeTimer = null;
 
 function lineHeightLocaleText(kind) {
   const locale = state?.uiLocale || "en";
@@ -105,14 +107,85 @@ function addChapterNavigation(bookSlug, storySlug) {
   else reader.appendChild(nav);
 }
 
+function clearReaderChromeTimer() {
+  if (readerChromeTimer) {
+    window.clearTimeout(readerChromeTimer);
+    readerChromeTimer = null;
+  }
+}
+
+function hideReaderChrome() {
+  if (!document.body.classList.contains("is-reader")) return;
+  document.body.classList.add("reader-chrome-hidden");
+  clearReaderChromeTimer();
+}
+
+function scheduleReaderChromeHide(delay = READER_CHROME_HIDE_DELAY) {
+  clearReaderChromeTimer();
+  if (!document.body.classList.contains("is-reader")) return;
+  readerChromeTimer = window.setTimeout(hideReaderChrome, delay);
+}
+
+function showReaderChrome({ autoHide = true } = {}) {
+  if (!document.body.classList.contains("is-reader")) return;
+  document.body.classList.remove("reader-chrome-hidden");
+  if (autoHide) scheduleReaderChromeHide();
+}
+
+function isReaderChromeInteractiveTarget(target) {
+  return Boolean(target?.closest?.(
+    ".topbar, .reader-tools, a, button, input, select, textarea, .lookup-word, .word-popup, .chapter-navigation"
+  ));
+}
+
+function resetReaderChromeForRoute() {
+  clearReaderChromeTimer();
+  document.body.classList.remove("reader-chrome-hidden");
+  if (document.body.classList.contains("is-reader")) scheduleReaderChromeHide();
+}
+
 const renderStoryWithPairs = renderStory;
 renderStory = async function renderStoryWithExtras(bookSlug, storySlug) {
   await renderStoryWithPairs(bookSlug, storySlug);
   applyReaderLineHeight();
   addChapterNavigation(bookSlug, storySlug);
+  resetReaderChromeForRoute();
 };
 
-document.querySelector("#lineHeightDown")?.addEventListener("click", () => changeReaderLineHeight(-LINE_HEIGHT_STEP));
-document.querySelector("#lineHeightUp")?.addEventListener("click", () => changeReaderLineHeight(LINE_HEIGHT_STEP));
+document.querySelector("#lineHeightDown")?.addEventListener("click", () => {
+  changeReaderLineHeight(-LINE_HEIGHT_STEP);
+  showReaderChrome();
+});
+
+document.querySelector("#lineHeightUp")?.addEventListener("click", () => {
+  changeReaderLineHeight(LINE_HEIGHT_STEP);
+  showReaderChrome();
+});
+
+/* A normal tap on the reading surface restores the bars. Interactive controls
+   keep their normal behavior and merely refresh the auto-hide timer. */
+document.addEventListener("pointerup", event => {
+  if (!document.body.classList.contains("is-reader")) return;
+
+  if (isReaderChromeInteractiveTarget(event.target)) {
+    if (!document.body.classList.contains("reader-chrome-hidden")) scheduleReaderChromeHide();
+    return;
+  }
+
+  showReaderChrome();
+});
+
+/* Once the user starts reading/scrolling, get the chrome out of the way. */
+window.addEventListener("scroll", () => {
+  if (!document.body.classList.contains("is-reader")) return;
+  if (window.scrollY > 12) hideReaderChrome();
+}, { passive: true });
+
+window.addEventListener("hashchange", () => {
+  if (!location.hash.includes("/story/")) {
+    clearReaderChromeTimer();
+    document.body.classList.remove("reader-chrome-hidden");
+  }
+});
 
 applyReaderLineHeight();
