@@ -1,0 +1,32 @@
+name: Temporary Legacy Chapter Inspection
+on:
+  push:
+    paths:
+      - '.github/workflows/temporary-dump-legacy.yml'
+  workflow_dispatch:
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        episode: [1,2,3,4,5,6]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Decode chapter
+        env:
+          EPISODE: ${{ matrix.episode }}
+        run: |
+          python - <<'PY'
+          import json, gzip, base64, os, pathlib
+          ep=int(os.environ['EPISODE'])
+          stories=json.loads(pathlib.Path('data/stories.json').read_text(encoding='utf-8'))
+          ch=next(c for b in stories['books'] if b['slug']=='witcher-path-notes' for c in b['chapters'] if c['episode']==ep)
+          if 'contentFileParts' in ch:
+              s=''.join(pathlib.Path(p.replace('./','')).read_text(encoding='utf-8').strip() for p in ch['contentFileParts'])
+          else:
+              s=pathlib.Path(ch['contentFile'].replace('./','')).read_text(encoding='utf-8').strip()
+          obj=json.loads(gzip.decompress(base64.b64decode(s)).decode('utf-8'))
+          print('===CHAPTER_JSON_BEGIN===')
+          print(json.dumps({'episode':ep,'publishedAt':ch['publishedAt'],'slug':ch['slug'],'title':ch['title'],'recap':ch['recap'],'content':obj},ensure_ascii=False))
+          print('===CHAPTER_JSON_END===')
+          PY
