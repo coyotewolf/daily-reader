@@ -18,10 +18,9 @@
     return route === '#/' || /^#\/book\/[^\s#?]+(?:\/story\/[^\s#?]+)?$/.test(route);
   }
 
-  function sendPageview() {
+  async function sendPageview() {
     const route = normalizedRoute();
     if (!validRoute(route) || route === lastRoute) return;
-    lastRoute = route;
 
     const payload = JSON.stringify({
       route,
@@ -30,21 +29,24 @@
     });
 
     try {
-      if (navigator.sendBeacon) {
-        const blob = new Blob([payload], { type: 'application/json' });
-        if (navigator.sendBeacon(endpoint(), blob)) return;
-      }
-    } catch (error) {
-      console.debug('Pageview beacon unavailable', error);
-    }
+      const response = await fetch(endpoint(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: payload,
+        keepalive: true,
+        credentials: 'omit',
+        mode: 'cors'
+      });
 
-    fetch(endpoint(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: payload,
-      keepalive: true,
-      credentials: 'omit'
-    }).catch(() => {});
+      if (!response.ok && response.status !== 204) {
+        console.debug('Pageview request failed', response.status);
+        return;
+      }
+
+      lastRoute = route;
+    } catch (error) {
+      console.debug('Pageview request failed', error);
+    }
   }
 
   function schedulePageview() {
