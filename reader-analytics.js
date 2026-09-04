@@ -18,6 +18,15 @@
     return route === '#/' || /^#\/book\/[^\s#?]+(?:\/story\/[^\s#?]+)?$/.test(route);
   }
 
+  function readingMode() {
+    const value = localStorage.getItem('pathnotes-language') || 'both';
+    return ['en', 'zh', 'both'].includes(value) ? value : 'both';
+  }
+
+  function uiLocale() {
+    return document.documentElement.lang || navigator.language || '';
+  }
+
   async function sendPageview() {
     const route = normalizedRoute();
     if (!validRoute(route) || route === lastRoute) return;
@@ -25,7 +34,10 @@
     const payload = JSON.stringify({
       route,
       path: location.pathname,
-      title: document.title
+      title: document.title,
+      readingMode: readingMode(),
+      uiLocale: uiLocale(),
+      referrer: document.referrer || ''
     });
 
     try {
