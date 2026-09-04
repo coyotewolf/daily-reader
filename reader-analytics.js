@@ -1,5 +1,7 @@
 (() => {
   const VERCEL_GATEWAY = 'https://path-notes-private-gateway.vercel.app';
+  const READER_KEY = 'pathnotes-reader-id';
+  const SESSION_KEY = 'pathnotes-session-id';
   let lastRoute = null;
 
   function endpoint() {
@@ -27,6 +29,47 @@
     return document.documentElement.lang || navigator.language || '';
   }
 
+  function makeId(prefix) {
+    if (globalThis.crypto?.randomUUID) return `${prefix}:${crypto.randomUUID()}`;
+    return `${prefix}:${Date.now().toString(36)}:${Math.random().toString(36).slice(2)}`;
+  }
+
+  function persistentReaderId() {
+    try {
+      let value = localStorage.getItem(READER_KEY);
+      if (!value) {
+        value = makeId('r');
+        localStorage.setItem(READER_KEY, value);
+      }
+      return value;
+    } catch {
+      return makeId('r');
+    }
+  }
+
+  function sessionId() {
+    try {
+      let value = sessionStorage.getItem(SESSION_KEY);
+      if (!value) {
+        value = makeId('s');
+        sessionStorage.setItem(SESSION_KEY, value);
+      }
+      return value;
+    } catch {
+      return makeId('s');
+    }
+  }
+
+  function displayMode() {
+    if (window.matchMedia?.('(display-mode: fullscreen)').matches) return 'fullscreen';
+    if (window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true) return 'standalone';
+    if (window.matchMedia?.('(display-mode: minimal-ui)').matches) return 'minimal-ui';
+    return 'browser';
+  }
+
+  const readerId = persistentReaderId();
+  const currentSessionId = sessionId();
+
   async function sendPageview() {
     const route = normalizedRoute();
     if (!validRoute(route) || route === lastRoute) return;
@@ -37,7 +80,10 @@
       title: document.title,
       readingMode: readingMode(),
       uiLocale: uiLocale(),
-      referrer: document.referrer || ''
+      referrer: document.referrer || '',
+      readerId,
+      sessionId: currentSessionId,
+      displayMode: displayMode()
     });
 
     try {
