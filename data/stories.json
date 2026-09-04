@@ -40,12 +40,12 @@
             "zh": "故事就此揭幕。利維亞的傑洛特正沿著龐塔爾河以南一路前行，一場惡劣的風雨迫使他在拉維林村暫時落腳。然而，村中接連出現遭到殘忍肢解的動物屍體——種種跡象顯示，潛伏在附近的東西，恐怕遠比狼群更加詭異。"
           },
           "contentFileParts": [
-            "./data/chapter-01-retranslated-01.b64part",
-            "./data/chapter-01-retranslated-02.b64part",
-            "./data/chapter-01-retranslated-03.b64part",
-            "./data/chapter-01-retranslated-04.b64part",
-            "./data/chapter-01-retranslated-05.b64part",
-            "./data/chapter-01-retranslated-06.b64part"
+            "./data/chapter-01-retranslated-v2-01.b64part",
+            "./data/chapter-01-retranslated-v2-02.b64part",
+            "./data/chapter-01-retranslated-v2-03.b64part",
+            "./data/chapter-01-retranslated-v2-04.b64part",
+            "./data/chapter-01-retranslated-v2-05.b64part",
+            "./data/chapter-01-retranslated-v2-06.b64part"
           ],
           "glossary": {},
           "formatVersion": 2
@@ -61,14 +61,14 @@
           },
           "recap": {
             "en": "Geralt stopped in the village of Ravelin after learning that dogs had been found hanging from trees with their hearts removed. In the alder grove, he discovered ritual markings, traces of magic, and a voice that could imitate a frightened child. Then it spoke his full name.",
-            "zh": "傑洛特 在 拉維林 村停留，得知當地的狗被吊在樹上，而且心臟遭到取走。他在榿木林裡發現了儀式性的符號、魔法痕跡，以及一個能模仿受驚孩童聲音的東西。接著，那個聲音叫出了他的全名。"
+            "zh": "傑洛特在拉維林村停留，得知當地的狗被吊在樹上，而且心臟遭到取走。他在榿木林裡發現了儀式性的符號、魔法痕跡，以及一個能模仿受驚孩童聲音的東西。接著，那個聲音叫出了他的全名。"
           },
           "contentFileParts": [
-            "./data/chapter-02-retranslated-01.b64part",
-            "./data/chapter-02-retranslated-02.b64part",
-            "./data/chapter-02-retranslated-03.b64part",
-            "./data/chapter-02-retranslated-04.b64part",
-            "./data/chapter-02-retranslated-05.b64part"
+            "./data/chapter-02-retranslated-v2-01.b64part",
+            "./data/chapter-02-retranslated-v2-02.b64part",
+            "./data/chapter-02-retranslated-v2-03.b64part",
+            "./data/chapter-02-retranslated-v2-04.b64part",
+            "./data/chapter-02-retranslated-v2-05.b64part"
           ],
           "glossary": {
             "universal law": "普遍法則、幾乎到處都成立的規律。",
@@ -103,16 +103,16 @@
           },
           "recap": {
             "en": "Geralt found the missing scholar Tomas Vell imprisoned in a ruined manor and killed a shape-changing woman marked with an old magical symbol. He then realized she had only been a vessel—and that the true presence in the alder grove was still alive. When screams and hand bells erupted from Ravelin, Geralt left the wounded Tomas behind and ran for the village.",
-            "zh": "傑洛特 在廢棄莊園中找到失蹤的學者 托馬斯·維爾，並殺死了一名身上刻有古老魔法符號、能夠改變外貌的女人。然而，他隨即發現那名女人只是一具容器——榿木林裡真正的存在依然活著。當 拉維林 傳來尖叫與手搖鈴聲時，傑洛特 將受傷的 托馬斯 留在後方，奔回村莊。"
+            "zh": "傑洛特在廢棄莊園中找到失蹤的學者托馬斯·維爾，並殺死了一名身上刻有古老魔法符號、能夠改變外貌的女人。然而，他隨即發現那名女人只是一具容器——榿木林裡真正的存在依然活著。當拉維林傳來尖叫與手搖鈴聲時，傑洛特將受傷的托馬斯留在後方，奔回村莊。"
           },
           "glossary": {},
           "contentFileParts": [
-            "./data/chapter-03-retranslated-01.b64part",
-            "./data/chapter-03-retranslated-02.b64part",
-            "./data/chapter-03-retranslated-03.b64part",
-            "./data/chapter-03-retranslated-04.b64part",
-            "./data/chapter-03-retranslated-05.b64part",
-            "./data/chapter-03-retranslated-06.b64part"
+            "./data/chapter-03-retranslated-v2-01.b64part",
+            "./data/chapter-03-retranslated-v2-02.b64part",
+            "./data/chapter-03-retranslated-v2-03.b64part",
+            "./data/chapter-03-retranslated-v2-04.b64part",
+            "./data/chapter-03-retranslated-v2-05.b64part",
+            "./data/chapter-03-retranslated-v2-06.b64part"
           ],
           "formatVersion": 2
         },
@@ -127,19 +127,18 @@
           },
           "recap": {
             "en": "Back in Ravelin, Geralt learned that the presence in the grove could reach into memories and use the dead against the living. The village midwife, Edda, revealed that decades earlier a strange girl named Ilse had been studied by the healer Visenna before dying beneath the old manor. Among Visenna’s surviving notes, Geralt found a troubling reference to Elder Blood—and then heard his mother’s voice outside Edda’s door.",
-            "zh": "回到 拉維林 後，傑洛特 發現樹林裡的存在能深入人的記憶，利用死者對付活人。村中的接生婆 艾達 告訴他，數十年前，一名叫 伊爾瑟 的神祕女孩曾受到治療師 薇森娜 的研究，最後死在舊莊園地下。傑洛特 在 薇森娜 遺留下來的筆記中發現一段令人不安的 上古之血 記載——接著，他在 艾達 門外聽見了母親的聲音。"
+            "zh": "回到拉維林後，傑洛特發現樹林裡的存在能深入人的記憶，利用死者對付活人。村中的接生婆艾達告訴他，數十年前，一名叫伊爾瑟的神祕女孩曾受到治療師薇森娜的研究，最後死在舊莊園地下。傑洛特在薇森娜遺留下來的筆記中發現一段令人不安的上古之血記載——接著，他在艾達門外聽見了母親的聲音。"
           },
           "contentFileParts": [
-            "./data/chapter-04-retranslated-01.b64part",
-            "./data/chapter-04-retranslated-02.b64part",
-            "./data/chapter-04-retranslated-03.b64part",
-            "./data/chapter-04-retranslated-04.b64part",
-            "./data/chapter-04-retranslated-05.b64part",
-            "./data/chapter-04-retranslated-06.b64part",
-            "./data/chapter-04-retranslated-07.b64part",
-            "./data/chapter-04-retranslated-08.b64part",
-            "./data/chapter-04-retranslated-09.b64part",
-            "./data/chapter-04-retranslated-10.b64part"
+            "./data/chapter-04-retranslated-v2-01.b64part",
+            "./data/chapter-04-retranslated-v2-02.b64part",
+            "./data/chapter-04-retranslated-v2-03.b64part",
+            "./data/chapter-04-retranslated-v2-04.b64part",
+            "./data/chapter-04-retranslated-v2-05.b64part",
+            "./data/chapter-04-retranslated-v2-06.b64part",
+            "./data/chapter-04-retranslated-v2-07.b64part",
+            "./data/chapter-04-retranslated-v2-08.b64part",
+            "./data/chapter-04-retranslated-v2-09.b64part"
           ],
           "glossary": {},
           "formatVersion": 2
@@ -155,17 +154,17 @@
           },
           "recap": {
             "en": "Geralt burned Visenna’s notebook to break Ilse’s hold over Ravelin, freeing the villagers from a web of stolen memories. In the aftermath, Tomas admitted that he had been working for a mysterious man called Master Aven, who was collecting records on magical bloodlines and unusual inherited abilities. Geralt intended to leave at dawn. Ravelin, however, had other plans.",
-            "zh": "傑洛特 燒掉 薇森娜 的筆記，打破 伊爾瑟 對 拉維林 的控制，將村民從被竊取記憶所構成的魔法網中解救出來。事後，托馬斯 坦承自己曾替一名神祕男子 艾文大師 工作，對方正在收集與魔法血統及特殊遺傳能力有關的紀錄。傑洛特 原本打算天亮便離開。然而，拉維林 似乎另有安排。"
+            "zh": "傑洛特燒掉薇森娜的筆記，打破伊爾瑟對拉維林的控制，將村民從被竊取記憶所構成的魔法網中解救出來。事後，托馬斯坦承自己曾替一名神祕男子艾文大師工作，對方正在收集與魔法血統及特殊遺傳能力有關的紀錄。傑洛特原本打算天亮便離開。然而，拉維林似乎另有安排。"
           },
           "contentFileParts": [
-            "./data/chapter-05-retranslated-01.b64part",
-            "./data/chapter-05-retranslated-02.b64part",
-            "./data/chapter-05-retranslated-03.b64part",
-            "./data/chapter-05-retranslated-04.b64part",
-            "./data/chapter-05-retranslated-05.b64part",
-            "./data/chapter-05-retranslated-06.b64part",
-            "./data/chapter-05-retranslated-07.b64part",
-            "./data/chapter-05-retranslated-08.b64part"
+            "./data/chapter-05-retranslated-v2-01.b64part",
+            "./data/chapter-05-retranslated-v2-02.b64part",
+            "./data/chapter-05-retranslated-v2-03.b64part",
+            "./data/chapter-05-retranslated-v2-04.b64part",
+            "./data/chapter-05-retranslated-v2-05.b64part",
+            "./data/chapter-05-retranslated-v2-06.b64part",
+            "./data/chapter-05-retranslated-v2-07.b64part",
+            "./data/chapter-05-retranslated-v2-08.b64part"
           ],
           "glossary": {},
           "formatVersion": 2
@@ -181,18 +180,18 @@
           },
           "recap": {
             "en": "Geralt and Tomas left Ravelin for Oxenfurt after learning that Master Aven had been collecting records on magical inheritance, unusual children, and broken family lines across the Northern Kingdoms. Tomas also revealed that Aven had searched old Cintran genealogies connected to several families—including Raven. Geralt now suspects that the false Elder Blood trail was created deliberately, and that someone wants researchers looking in the wrong direction.",
-            "zh": "傑洛特 和 托馬斯 離開 拉維林 前往 奧克森福特，因為他們發現 艾文大師 一直在收集與魔法遺傳、異常孩童以及北方諸國中斷裂家族血統有關的紀錄。托馬斯 同時透露，艾文 曾調查多份古老的 辛特拉 家譜，其中包括 雷文。傑洛特 如今開始懷疑，關於 上古之血 的錯誤線索是有人刻意製造的，而且有人希望研究者往錯誤方向追查。"
+            "zh": "傑洛特和托馬斯離開拉維林前往奧克森福特，因為他們發現艾文大師一直在收集與魔法遺傳、異常孩童以及北方諸國中斷裂家族血統有關的紀錄。托馬斯同時透露，艾文曾調查多份古老的辛特拉家譜，其中包括雷文。傑洛特如今開始懷疑，關於上古之血的錯誤線索是有人刻意製造的，而且有人希望研究者往錯誤方向追查。"
           },
           "contentFileParts": [
-            "./data/chapter-06-retranslated-01.b64part",
-            "./data/chapter-06-retranslated-02.b64part",
-            "./data/chapter-06-retranslated-03.b64part",
-            "./data/chapter-06-retranslated-04.b64part",
-            "./data/chapter-06-retranslated-05.b64part",
-            "./data/chapter-06-retranslated-06.b64part",
-            "./data/chapter-06-retranslated-07.b64part",
-            "./data/chapter-06-retranslated-08.b64part",
-            "./data/chapter-06-retranslated-09.b64part"
+            "./data/chapter-06-retranslated-v2-01.b64part",
+            "./data/chapter-06-retranslated-v2-02.b64part",
+            "./data/chapter-06-retranslated-v2-03.b64part",
+            "./data/chapter-06-retranslated-v2-04.b64part",
+            "./data/chapter-06-retranslated-v2-05.b64part",
+            "./data/chapter-06-retranslated-v2-06.b64part",
+            "./data/chapter-06-retranslated-v2-07.b64part",
+            "./data/chapter-06-retranslated-v2-08.b64part",
+            "./data/chapter-06-retranslated-v2-09.b64part"
           ],
           "glossary": {},
           "formatVersion": 2
