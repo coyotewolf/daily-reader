@@ -42,3 +42,4 @@ jobs:
         uses: actions/deploy-pages@v4
 
 # chapter 8 repaired mirror deployment
+# compatible catalog deployment
