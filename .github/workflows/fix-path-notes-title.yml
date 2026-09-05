@@ -1,0 +1,45 @@
+name: Fix Path Notes Chinese Title
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-path-notes-title.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Chinese title metadata
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('data/stories.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          book = next(b for b in data['books'] if b['slug'] == 'witcher-path-notes')
+          book.setdefault('coverTitle', {})['zhHant'] = '旅途筆記'
+          book['coverTitle']['zhHans'] = '旅途笔记'
+          book.setdefault('title', {})['zhHant'] = '獵魔士：旅途筆記'
+          book['title']['zhHans'] = '猎魔士：旅途笔记'
+          p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+      - name: Validate
+        run: python tools/validate_library.py
+
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/stories.json
+          git commit -m 'Rename Chinese Path Notes title to 旅途筆記'
+          git push origin HEAD:main
