@@ -11,14 +11,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "pages-recovery-${{ github.sha }}"
   cancel-in-progress: true
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,8 +26,6 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
@@ -40,6 +35,3 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
-# chapter 8 repaired mirror deployment
-# compatible catalog deployment
