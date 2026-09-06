@@ -1,0 +1,35 @@
+name: Sync Episode 9 From Production
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/sync-episode-09-from-production.yml"]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull canonical production payload
+        run: |
+          set -euo pipefail
+          base='https://path-notes-private-gateway.vercel.app'
+          curl --fail --show-error --silent "$base/data/chapter-09-ledger-under-water-01.b64part" -o data/chapter-09-ledger-under-water-01.b64part
+          curl --fail --show-error --silent "$base/data/chapter-09-ledger-under-water-02.b64part" -o data/chapter-09-ledger-under-water-02.b64part
+          curl --fail --show-error --silent "$base/data/chapter-09-ledger-under-water-03.b64part" -o data/chapter-09-ledger-under-water-03.b64part
+          curl --fail --show-error --silent "$base/data/stories.json" -o data/stories.json
+          python tools/validate_library.py
+          python - <<'PY'
+          import json
+          d=json.load(open('data/stories.json'))
+          b=next(x for x in d['books'] if x['slug']=='witcher-path-notes')
+          c=next((x for x in b['chapters'] if x['episode']==9),None)
+          assert c and c['publishedAt']=='2026-09-06' and c['slug']=='the-ledger-under-water'
+          assert len(c['contentFileParts'])==3
+          print('Mirror payload verified:',c['title']['en'])
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/stories.json data/chapter-09-ledger-under-water-*.b64part
+          git commit -m "Mirror Witcher Path Notes Episode 9"
+          git push
