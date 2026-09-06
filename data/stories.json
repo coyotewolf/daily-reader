@@ -265,6 +265,38 @@
             "safe house": "安全屋；為躲避追捕或保護特定人士而秘密使用的住所。",
             "natural philosophy": "自然哲學；前現代對自然世界、物質與現象研究的廣義學科名稱。"
           }
+        },
+        {
+          "episode": 9,
+          "publishedAt": "2026-09-06",
+          "slug": "the-ledger-under-water",
+          "formatVersion": 2,
+          "title": {
+            "en": "Chapter Nine — The Ledger Under Water",
+            "zhHant": "第九章——水下帳冊",
+            "zhHans": "第九章——水下账册"
+          },
+          "recap": {
+            "en": "After surviving an ambush in Oxenfurt, Geralt and his companions learned from the wounded Valek that the Split Tower network had begun tracking children, healers, and midwives. Seren also revealed that Professor Halven Rusk of Natural Philosophy had disappeared, while Dorr’s last hidden lead pointed to a deposit box at the south ferry office.",
+            "zh": "在奧克森福特躲過一場伏擊後，傑洛特一行從受傷的瓦雷克口中得知，「裂塔」網絡已開始追查孩童、治療師與接生婆。瑟倫同時發現，自然哲學院的哈爾文・魯斯克教授失蹤，而多爾留下的最後一條祕密線索，則指向南渡口辦事處的一只寄存箱。"
+          },
+          "contentFileParts": [
+            "./data/chapter-09-ledger-under-water-01.b64part",
+            "./data/chapter-09-ledger-under-water-02.b64part",
+            "./data/chapter-09-ledger-under-water-03.b64part"
+          ],
+          "glossary": {
+            "curfew": "宵禁；夜間禁止或限制民眾外出的命令。",
+            "pilings": "樁柱；打入水底或地面、用來支撐建築的平台柱。",
+            "paperweight": "紙鎮；壓住紙張、防止被風吹走的重物。",
+            "pry out": "撬出、用槓桿力把東西拔出來。",
+            "convulse": "抽搐；身體突然不受控制地劇烈收縮。",
+            "lure": "誘餌；用來吸引人或動物靠近的東西。",
+            "resin": "樹脂；植物分泌的黏稠物質，也可用於藥材、香料或黏合。",
+            "waxed cloth": "浸蠟布；經過蠟處理、較能防潮的布料。",
+            "controversial": "具爭議性的；容易引起強烈反對或辯論的。",
+            "uncertainty": "不確定性；尚未知道事實或結果的狀態。"
+          }
         }
       ]
     }
