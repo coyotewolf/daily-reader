@@ -1,0 +1,39 @@
+name: Mirror Semantic Reflow Temp
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  mirror:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mirror canonical reader and reflowed content
+        run: |
+          set -euo pipefail
+          BASE='https://path-notes-private-gateway.vercel.app'
+          curl -fsSL "$BASE/reader-pairs.js" -o reader-pairs.js
+          curl -fsSL "$BASE/reader-extras.css" -o reader-extras.css
+          curl -fsSL "$BASE/data/stories.json" -o data/stories.json
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          base='https://path-notes-private-gateway.vercel.app/'
+          lib=json.loads(Path('data/stories.json').read_text(encoding='utf-8'))
+          for book in lib.get('books',[]):
+              for ch in book.get('chapters',[]):
+                  for rel in ch.get('contentFileParts',[]):
+                      path=rel.replace('./','',1)
+                      Path(path).parent.mkdir(parents=True,exist_ok=True)
+                      subprocess.run(['curl','-fsSL',base+path,'-o',path],check=True)
+          PY
+          python tools/validate_library.py
+      - name: Commit mirror
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reader-pairs.js reader-extras.css data/stories.json data/
+          git commit -m 'Mirror semantic bilingual paragraph reflow' || exit 0
+          git push
