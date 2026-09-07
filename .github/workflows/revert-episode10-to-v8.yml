@@ -1,0 +1,38 @@
+name: Revert Episode 10 to V8
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/revert-episode10-to-v8.yml"]
+permissions:
+  contents: write
+jobs:
+  revert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore Episode 10 V8 payload references
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          path='data/stories.json'
+          with open(path,encoding='utf-8') as f:
+              m=json.load(f)
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if x['episode']==10)
+          c['contentFileParts']=[
+              './data/chapter-10-bell-beneath-river-reflow-v8-01.b64part',
+              './data/chapter-10-bell-beneath-river-reflow-v8-02.b64part'
+          ]
+          with open(path,'w',encoding='utf-8') as f:
+              json.dump(m,f,ensure_ascii=False,indent=2)
+              f.write('\n')
+          PY
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/stories.json
+          git commit -m "Revert Episode 10 punctuation rewrite to V8"
+          git push
