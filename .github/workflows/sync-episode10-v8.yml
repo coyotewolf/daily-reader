@@ -1,0 +1,59 @@
+name: Sync Episode 10 V8 From Production
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/sync-episode10-v8.yml"]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch verified production metadata and Episode 10 payload
+        run: |
+          set -euo pipefail
+          base='https://path-notes-private-gateway.vercel.app'
+          curl -fsSL "$base/data/stories.json" -o /tmp/stories.json
+          python - <<'PY'
+          import json
+          m=json.load(open('/tmp/stories.json',encoding='utf-8'))
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if x['episode']==10)
+          assert c['publishedAt']=='2026-09-07'
+          assert c['contentFileParts']==[
+            './data/chapter-10-bell-beneath-river-reflow-v8-01.b64part',
+            './data/chapter-10-bell-beneath-river-reflow-v8-02.b64part'
+          ]
+          print('\n'.join(c['contentFileParts']))
+          PY
+          for f in chapter-10-bell-beneath-river-reflow-v8-01.b64part chapter-10-bell-beneath-river-reflow-v8-02.b64part; do
+            test ! -e "data/$f" || { echo "Refusing overwrite of data/$f"; exit 1; }
+            curl -fsSL "$base/data/$f" -o "data/$f"
+          done
+          python - <<'PY'
+          import json,base64,gzip
+          m=json.load(open('/tmp/stories.json',encoding='utf-8'))
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if x['episode']==10)
+          raw=''.join(open(p[2:],encoding='utf-8').read().strip() for p in c['contentFileParts'])
+          obj=json.loads(gzip.decompress(base64.b64decode(raw)).decode('utf-8'))
+          pairs=obj['pairs']
+          assert len(pairs)==51
+          a=next(p for p in pairs if '奧斯里克壓低聲音' in p['zh'])
+          g=next(p for p in pairs if p['zh']=='傑洛特舉起多爾折好的紙頁。')
+          e=next(p for p in pairs if p['zh']=='老人閉了閉眼。「那我們已經晚了。」')
+          assert len({a['paragraph'],g['paragraph'],e['paragraph']})==3
+          s=next(p for p in pairs if '奧克森福特是蓋在更古老的東西上面的' in p['zh'])
+          assert s['zh']=='「奧克森福特是蓋在更古老的東西上面的。」瑟倫說「人人都這麼講。」'
+          print('Production V8 payload checks passed')
+          PY
+          cp /tmp/stories.json data/stories.json
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/chapter-10-bell-beneath-river-reflow-v8-*.b64part data/stories.json
+          git commit -m "Mirror Episode 10 dialogue fix V8"
+          git push
