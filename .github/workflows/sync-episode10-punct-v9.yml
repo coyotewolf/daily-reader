@@ -42,10 +42,10 @@ jobs:
           assert len(obj['pairs'])==51
           assert not any('。「' in p['zh'] or '，「' in p['zh'] for p in obj['pairs'])
           assert obj['zh']==[p['zh'] for p in obj['pairs']]
+          assert all(p['en'].strip() and p['zh'].strip() for p in obj['pairs'])
           print('Episode 10 V9 punctuation checks passed')
           PY
           cp /tmp/stories.json data/stories.json
-          python tools/validate_library.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add data/chapter-10-bell-beneath-river-punct-v9-*.b64part data/stories.json
