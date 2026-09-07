@@ -41,3 +41,4 @@ jobs:
 # deployment trigger: episode 10 dialogue reflow v3 / 2026-09-07
 # deployment trigger: episode 10 punctuation v9 / 2026-09-08
 # deployment trigger: restored mirror metadata + episode 10 punctuation v9 / 2026-09-08
+# deployment trigger: rollback episode 10 to v8 / 2026-09-08
