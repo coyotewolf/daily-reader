@@ -1,0 +1,55 @@
+name: Mirror Episode 10 Dialogue Reflow
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/reflow-episode-10-dialogue-v2.yml"]
+permissions:
+  contents: write
+jobs:
+  reflow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild mirrored Episode 10 dialogue paragraphs
+        run: |
+          python - <<'PY'
+          import json,base64,gzip,pathlib,io
+          root=pathlib.Path('.'); meta_path=root/'data/stories.json'
+          meta=json.loads(meta_path.read_text(encoding='utf-8'))
+          book=next(b for b in meta['books'] if b['slug']=='witcher-path-notes')
+          ch=next(c for c in book['chapters'] if c['episode']==10); assert ch['publishedAt']=='2026-09-07'
+          raw=''.join((root/p.replace('./','')).read_text(encoding='utf-8').strip() for p in ch['contentFileParts'])
+          obj=json.loads(gzip.decompress(base64.b64decode(raw)).decode('utf-8')); old=obj['pairs']
+          def cut(text,markers):
+              out=[]; rest=text
+              for marker in markers:
+                  a,b=rest.split(marker,1); out.append(a.rstrip()); rest=marker+b
+              out.append(rest.strip()); return out
+          markers={3:(['"Everyone says it until'],['「人人都會講，直到']),7:([ '"Elven?" Tomas asked.','Seren crouched beside the wall.','Geralt touched one groove.' ],['「精靈的？」托馬斯問。','瑟倫蹲到牆邊。','傑洛特摸過其中一道凹槽。']),9:(['Tomas stared at him.'],['托馬斯瞪著他。']),13:(['Seren gave him a sideways look.','"She\'s holding the crossbow."'],['瑟倫斜了他一眼。','「十字弓在她手上。」']),15:(['The grey-haired man looked exhausted'],['灰髮男人的神情只有疲憊']),18:(['Rusk gave a tired smile.'],['魯斯克疲憊地笑了笑。']),22:(['"Yes," Rusk said.'],['「沒錯。」魯斯克說。']),27:(['Rusk shook his head.'],['魯斯克搖頭。']),28:(['"Then he lied to you," Rusk said'],['「那他騙了你。」魯斯克語氣裡沒有惡意'])}
+          expanded=[]; origin=[]
+          for i,p in enumerate(old):
+              if i not in markers: expanded.append({'paragraph':0,'en':p['en'],'zh':p['zh']}); origin.append((i,0)); continue
+              ens=cut(p['en'],markers[i][0]); zhs=cut(p['zh'],markers[i][1]); assert len(ens)==len(zhs); assert ' '.join(ens)==p['en']; assert ''.join(zhs)==p['zh']
+              for j,(en,zh) in enumerate(zip(ens,zhs)): expanded.append({'paragraph':0,'en':en,'zh':zh}); origin.append((i,j))
+          para={(0,0):1,(1,0):1,(2,0):2,(3,0):3,(3,1):4,(4,0):5,(5,0):5,(6,0):6,(7,0):6,(7,1):7,(7,2):8,(7,3):9,(8,0):10,(9,0):11,(9,1):12,(10,0):13,(11,0):13,(12,0):14,(13,0):15,(13,1):16,(13,2):17,(14,0):18,(15,0):19,(15,1):20,(16,0):21,(17,0):21,(18,0):22,(18,1):23,(19,0):24,(20,0):25,(21,0):25,(22,0):26,(22,1):27,(23,0):28,(24,0):29,(25,0):30,(26,0):31,(27,0):32,(27,1):33,(28,0):34,(28,1):35,(29,0):36,(30,0):37,(31,0):37,(32,0):38,(33,0):38,(34,0):39,(35,0):39,(36,0):40}
+          assert len(expanded)==49 and set(origin)==set(para)
+          for p,o in zip(expanded,origin): p['paragraph']=para[o]
+          assert ' '.join(p['en'] for p in expanded)==' '.join(p['en'] for p in old); assert ''.join(p['zh'] for p in expanded)==''.join(p['zh'] for p in old)
+          content={'schemaVersion':2,'pairs':expanded,'en':[p['en'] for p in expanded],'zh':[p['zh'] for p in expanded]}
+          payload=json.dumps(content,ensure_ascii=False,separators=(',',':')).encode(); buf=io.BytesIO()
+          with gzip.GzipFile(fileobj=buf,mode='wb',mtime=0) as gz: gz.write(payload)
+          b64=base64.b64encode(buf.getvalue()).decode(); chunks=[b64[i:i+6000] for i in range(0,len(b64),6000)]; paths=[]
+          for n,chunk in enumerate(chunks,1):
+              p=root/f'data/chapter-10-bell-beneath-river-reflow-v2-{n:02d}.b64part'
+              if p.exists(): raise SystemExit(f'refusing overwrite: {p}')
+              p.write_text(chunk); paths.append(p)
+          assert json.loads(gzip.decompress(base64.b64decode(''.join(p.read_text() for p in paths))).decode())==content
+          ch['contentFileParts']=['./'+str(p) for p in paths]; ch['formatVersion']=2
+          meta_path.write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/chapter-10-bell-beneath-river-reflow-v2-*.b64part data/stories.json
+          git commit -m "Mirror Episode 10 dialogue reflow"
+          git push
