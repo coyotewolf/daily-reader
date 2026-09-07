@@ -1,0 +1,54 @@
+name: Sync Episode 10 From Production
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/sync-episode-10-from-production.yml"]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync canonical Episode 10
+        run: |
+          python - <<'PY'
+          import json, pathlib, urllib.request, base64, gzip
+          root=pathlib.Path('.')
+          base='https://path-notes-private-gateway.vercel.app/'
+          with urllib.request.urlopen(base+'data/stories.json',timeout=20) as r:
+              prod=json.load(r)
+          pbook=next(b for b in prod['books'] if b['slug']=='witcher-path-notes')
+          ch=next(c for c in pbook['chapters'] if c['episode']==10)
+          assert ch['publishedAt']=='2026-09-07'
+          assert ch['slug']=='the-bell-beneath-the-river'
+          local_path=root/'data/stories.json'
+          local=json.loads(local_path.read_text())
+          lbook=next(b for b in local['books'] if b['slug']=='witcher-path-notes')
+          if any(c.get('episode')==10 or c.get('slug')==ch['slug'] for c in lbook['chapters']):
+              raise SystemExit('Episode 10 already exists; refusing duplicate')
+          parts=[]
+          for rel in ch['contentFileParts']:
+              fp=root/rel.replace('./','')
+              if fp.exists(): raise SystemExit(f'Unknown existing part: {fp}')
+              with urllib.request.urlopen(base+rel.replace('./',''),timeout=20) as r:
+                  txt=r.read().decode('utf-8').strip()
+              fp.write_text(txt)
+              parts.append(txt)
+          obj=json.loads(gzip.decompress(base64.b64decode(''.join(parts))).decode('utf-8'))
+          pairs=obj['pairs']
+          assert obj.get('schemaVersion')==2
+          assert pairs and all(isinstance(p.get('paragraph'),int) and str(p.get('en','')).strip() and str(p.get('zh','')).strip() for p in pairs)
+          assert obj['en']==[p['en'] for p in pairs] and obj['zh']==[p['zh'] for p in pairs]
+          lbook['chapters'].append(ch)
+          lbook['chapters'].sort(key=lambda c:c['episode'])
+          # Metadata is the final content write.
+          local_path.write_text(json.dumps(local,ensure_ascii=False,indent=2)+'\n')
+          print('Synced Episode 10',len(pairs),'pairs',len(parts),'parts')
+          PY
+          python tools/validate_library.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/chapter-10-bell-beneath-river-*.b64part data/stories.json
+          git commit -m "Mirror Witcher Path Notes Episode 10"
+          git push
