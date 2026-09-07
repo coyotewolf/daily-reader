@@ -1,0 +1,43 @@
+name: Restore mirror metadata for Episode 10 V9
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/restore-mirror-metadata-ep10-v9.yml"]
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore compatible metadata and keep Episode 10 V9
+        run: |
+          set -euo pipefail
+          git show 35b2629aa8e2fd1d9d4c328b938450656e90ac35:data/stories.json > /tmp/mirror-stories.json
+          curl -fsSL https://path-notes-private-gateway.vercel.app/data/stories.json -o /tmp/prod-stories.json
+          python - <<'PY'
+          import json
+          mirror=json.load(open('/tmp/mirror-stories.json',encoding='utf-8'))
+          prod=json.load(open('/tmp/prod-stories.json',encoding='utf-8'))
+          mb=next(b for b in mirror['books'] if b['slug']=='witcher-path-notes')
+          pb=next(b for b in prod['books'] if b['slug']=='witcher-path-notes')
+          mc=next(c for c in mb['chapters'] if c['episode']==10)
+          pc=next(c for c in pb['chapters'] if c['episode']==10)
+          assert pc['publishedAt']=='2026-09-07'
+          assert pc['contentFileParts']==[
+            './data/chapter-10-bell-beneath-river-punct-v9-01.b64part',
+            './data/chapter-10-bell-beneath-river-punct-v9-02.b64part'
+          ]
+          # Preserve mirror-compatible metadata for older episodes; replace only Episode 10 metadata.
+          idx=mb['chapters'].index(mc)
+          mb['chapters'][idx]=pc
+          open('data/stories.json','w',encoding='utf-8').write(json.dumps(mirror,ensure_ascii=False,indent=2)+'\n')
+          PY
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/stories.json
+          git commit -m "Restore mirror metadata and keep Episode 10 punctuation V9"
+          git push
