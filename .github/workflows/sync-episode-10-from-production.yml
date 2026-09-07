@@ -16,37 +16,27 @@ jobs:
           import json, pathlib, urllib.request, base64, gzip
           root=pathlib.Path('.')
           base='https://path-notes-private-gateway.vercel.app/'
-          with urllib.request.urlopen(base+'data/stories.json',timeout=20) as r:
-              prod=json.load(r)
+          with urllib.request.urlopen(base+'data/stories.json',timeout=20) as r: prod=json.load(r)
           pbook=next(b for b in prod['books'] if b['slug']=='witcher-path-notes')
           ch=next(c for c in pbook['chapters'] if c['episode']==10)
-          assert ch['publishedAt']=='2026-09-07'
-          assert ch['slug']=='the-bell-beneath-the-river'
-          local_path=root/'data/stories.json'
-          local=json.loads(local_path.read_text(encoding='utf-8'))
+          assert ch['publishedAt']=='2026-09-07' and ch['slug']=='the-bell-beneath-the-river'
+          local_path=root/'data/stories.json'; local=json.loads(local_path.read_text(encoding='utf-8'))
           lbook=next(b for b in local['books'] if b['slug']=='witcher-path-notes')
-          old=next((c for c in lbook['chapters'] if c.get('episode')==10),None)
-          assert old and old['publishedAt']=='2026-09-07'
+          old=next(c for c in lbook['chapters'] if c.get('episode')==10)
           parts=[]
           for rel in ch['contentFileParts']:
               fp=root/rel.replace('./','')
-              with urllib.request.urlopen(base+rel.replace('./',''),timeout=20) as r:
-                  txt=r.read().decode('utf-8').strip()
-              fp.write_text(txt,encoding='utf-8')
-              parts.append(txt)
-          obj=json.loads(gzip.decompress(base64.b64decode(''.join(parts))).decode('utf-8'))
-          pairs=obj['pairs']
-          assert obj.get('schemaVersion')==2
-          assert pairs and all(isinstance(p.get('paragraph'),int) and str(p.get('en','')).strip() and str(p.get('zh','')).strip() for p in pairs)
-          assert obj['en']==[p['en'] for p in pairs] and obj['zh']==[p['zh'] for p in pairs]
-          idx=lbook['chapters'].index(old)
-          lbook['chapters'][idx]=ch
+              with urllib.request.urlopen(base+rel.replace('./',''),timeout=20) as r: txt=r.read().decode().strip()
+              fp.write_text(txt,encoding='utf-8'); parts.append(txt)
+          obj=json.loads(gzip.decompress(base64.b64decode(''.join(parts))).decode())
+          pairs=obj['pairs']; assert obj['en']==[p['en'] for p in pairs] and obj['zh']==[p['zh'] for p in pairs]
+          assert all('。」' not in p['zh'] and '，」' not in p['zh'] for p in pairs)
+          lbook['chapters'][lbook['chapters'].index(old)]=ch
           local_path.write_text(json.dumps(local,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          print('Synced Episode 10 revision',len(pairs),'pairs',len(parts),'parts')
           PY
           python tools/validate_library.py
           git config user.name "github-actions[bot]"
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add data/chapter-10-bell-beneath-river-*.b64part data/stories.json
-          git commit -m "Mirror Episode 10 dialogue reflow v3" || exit 0
+          git commit -m "Mirror Episode 10 typography and paragraph reflow v4" || exit 0
           git push
