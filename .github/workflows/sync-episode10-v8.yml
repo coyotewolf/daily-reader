@@ -12,14 +12,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Fetch verified production metadata and Episode 10 payload
+      - name: Fetch and verify production Episode 10 V8
         run: |
           set -euo pipefail
           base='https://path-notes-private-gateway.vercel.app'
-          curl -fsSL "$base/data/stories.json" -o /tmp/stories.json
+          curl -fsSL "$base/data/stories.json" -o /tmp/production-stories.json
           python - <<'PY'
           import json
-          m=json.load(open('/tmp/stories.json',encoding='utf-8'))
+          m=json.load(open('/tmp/production-stories.json',encoding='utf-8'))
           b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
           c=next(x for x in b['chapters'] if x['episode']==10)
           assert c['publishedAt']=='2026-09-07'
@@ -27,7 +27,6 @@ jobs:
             './data/chapter-10-bell-beneath-river-reflow-v8-01.b64part',
             './data/chapter-10-bell-beneath-river-reflow-v8-02.b64part'
           ]
-          print('\n'.join(c['contentFileParts']))
           PY
           for f in chapter-10-bell-beneath-river-reflow-v8-01.b64part chapter-10-bell-beneath-river-reflow-v8-02.b64part; do
             test ! -e "data/$f" || { echo "Refusing overwrite of data/$f"; exit 1; }
@@ -35,10 +34,10 @@ jobs:
           done
           python - <<'PY'
           import json,base64,gzip
-          m=json.load(open('/tmp/stories.json',encoding='utf-8'))
-          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
-          c=next(x for x in b['chapters'] if x['episode']==10)
-          raw=''.join(open(p[2:],encoding='utf-8').read().strip() for p in c['contentFileParts'])
+          prod=json.load(open('/tmp/production-stories.json',encoding='utf-8'))
+          pb=next(x for x in prod['books'] if x['slug']=='witcher-path-notes')
+          pc=next(x for x in pb['chapters'] if x['episode']==10)
+          raw=''.join(open(p[2:],encoding='utf-8').read().strip() for p in pc['contentFileParts'])
           obj=json.loads(gzip.decompress(base64.b64decode(raw)).decode('utf-8'))
           pairs=obj['pairs']
           assert len(pairs)==51
@@ -48,9 +47,17 @@ jobs:
           assert len({a['paragraph'],g['paragraph'],e['paragraph']})==3
           s=next(p for p in pairs if '奧克森福特是蓋在更古老的東西上面的' in p['zh'])
           assert s['zh']=='「奧克森福特是蓋在更古老的東西上面的。」瑟倫說「人人都這麼講。」'
-          print('Production V8 payload checks passed')
+
+          # Preserve public mirror's compatibility metadata for Chapters 1–9;
+          # replace only Episode 10 with the verified production metadata.
+          local=json.load(open('data/stories.json',encoding='utf-8'))
+          lb=next(x for x in local['books'] if x['slug']=='witcher-path-notes')
+          idx=next(i for i,x in enumerate(lb['chapters']) if x['episode']==10)
+          lb['chapters'][idx]=pc
+          with open('data/stories.json','w',encoding='utf-8') as f:
+              json.dump(local,f,ensure_ascii=False,indent=2); f.write('\n')
+          print('Production V8 payload and speaker-boundary checks passed')
           PY
-          cp /tmp/stories.json data/stories.json
           python tools/validate_library.py
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
