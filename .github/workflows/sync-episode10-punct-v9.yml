@@ -1,0 +1,53 @@
+name: Sync Episode 10 punctuation V9
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/sync-episode10-punct-v9.yml"]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch verified production V9
+        run: |
+          set -euo pipefail
+          base='https://path-notes-private-gateway.vercel.app'
+          curl -fsSL "$base/data/stories.json" -o /tmp/stories.json
+          python - <<'PY'
+          import json
+          m=json.load(open('/tmp/stories.json',encoding='utf-8'))
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if x['episode']==10)
+          assert c['publishedAt']=='2026-09-07'
+          assert c['contentFileParts']==[
+            './data/chapter-10-bell-beneath-river-punct-v9-01.b64part',
+            './data/chapter-10-bell-beneath-river-punct-v9-02.b64part'
+          ]
+          PY
+          for f in chapter-10-bell-beneath-river-punct-v9-01.b64part chapter-10-bell-beneath-river-punct-v9-02.b64part; do
+            test ! -e "data/$f" || { echo "Refusing overwrite of data/$f"; exit 1; }
+            curl -fsSL "$base/data/$f" -o "data/$f"
+          done
+          python - <<'PY'
+          import json,base64,gzip
+          m=json.load(open('/tmp/stories.json',encoding='utf-8'))
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if x['episode']==10)
+          raw=''.join(open(p[2:],encoding='utf-8').read().strip() for p in c['contentFileParts'])
+          obj=json.loads(gzip.decompress(base64.b64decode(raw)).decode('utf-8'))
+          assert len(obj['pairs'])==51
+          assert not any('。「' in p['zh'] or '，「' in p['zh'] for p in obj['pairs'])
+          assert obj['zh']==[p['zh'] for p in obj['pairs']]
+          print('Episode 10 V9 punctuation checks passed')
+          PY
+          cp /tmp/stories.json data/stories.json
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/chapter-10-bell-beneath-river-punct-v9-*.b64part data/stories.json
+          git commit -m "Mirror Episode 10 Chinese punctuation V9"
+          git push
