@@ -303,6 +303,37 @@
             "controversial": "具爭議性的；容易引起強烈反對或辯論的。",
             "uncertainty": "不確定性；尚未知道事實或結果的狀態。"
           }
+        },
+        {
+          "episode": 10,
+          "publishedAt": "2026-09-07",
+          "slug": "the-bell-beneath-the-river",
+          "title": {
+            "en": "Chapter Ten — The Bell Beneath the River",
+            "zhHant": "第十章——河底鐘聲",
+            "zhHans": "第十章——河底钟声"
+          },
+          "recap": {
+            "en": "At the south ferry office, Geralt found a modified drowner, Dorr’s hidden ledger, and a witness list bearing Visenna’s name. The records suggested that children linked to unusual inherited traits had not been taken out of Oxenfurt at all, but hidden somewhere beneath the river.",
+            "zh": "在南渡口辦事處，傑洛特發現一隻遭人改造的水鬼、多爾藏起的帳冊，以及一份寫有薇森娜名字的見證者名單。紀錄顯示，那些與異常遺傳特徵有關的孩子並未被帶離奧克森福特，而是被藏在河底某處。"
+          },
+          "contentFileParts": [
+            "./data/chapter-10-bell-beneath-river-01.b64part",
+            "./data/chapter-10-bell-beneath-river-02.b64part"
+          ],
+          "glossary": {
+            "mortar": "灰漿；砌磚或石材時用來黏結縫隙的材料。",
+            "habitation": "有人居住、生活的跡象或狀態。",
+            "apothecary": "藥劑師；傳統上配製與販售藥物的人。",
+            "refuge": "避難所；為躲避危險而暫時藏身的地方。",
+            "illegitimate heir": "私生繼承人；非婚生但可能涉及繼承權的人。",
+            "genealogy": "家譜、族譜；記錄家族血緣與世系的資料。",
+            "altered": "被竄改、修改；此處指紀錄遭人動過手腳。",
+            "patron": "資助者、贊助人；長期提供金錢或機會支持某人的人。",
+            "buckled inward": "向內屈曲、鼓陷；受到外力後結構變形。",
+            "fasten": "固定、繫牢；把一件東西牢牢連接到另一件上。"
+          },
+          "formatVersion": 2
         }
       ]
     }
