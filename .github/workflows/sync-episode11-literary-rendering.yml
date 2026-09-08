@@ -1,0 +1,42 @@
+name: Sync Episode 11 Literary Rendering
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/sync-episode11-literary-rendering.yml']
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mirror production Episode 11 and reader CSS
+        run: |
+          set -euo pipefail
+          curl -fsSL https://path-notes-private-gateway.vercel.app/styles.css -o styles.css
+          curl -fsSL https://path-notes-private-gateway.vercel.app/data/stories.json -o /tmp/stories.json
+          python - <<'PY'
+          import json,pathlib,urllib.request
+          root=pathlib.Path('.')
+          prod=json.loads(pathlib.Path('/tmp/stories.json').read_text(encoding='utf-8'))
+          local=json.loads((root/'data/stories.json').read_text(encoding='utf-8'))
+          pb=next(b for b in prod['books'] if b['slug']=='witcher-path-notes')
+          lb=next(b for b in local['books'] if b['slug']=='witcher-path-notes')
+          pc=next(c for c in pb['chapters'] if int(c['episode'])==11)
+          idx=next(i for i,c in enumerate(lb['chapters']) if int(c['episode'])==11)
+          for part in pc['contentFileParts']:
+              rel=part[2:] if part.startswith('./') else part
+              url='https://path-notes-private-gateway.vercel.app/'+rel
+              (root/rel).write_bytes(urllib.request.urlopen(url,timeout=20).read())
+          lb['chapters'][idx]=pc
+          (root/'data/stories.json').write_text(json.dumps(local,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          grep -q 'story-pair.dialogue .en,.story-pair.dialogue .zh{padding-left:0;border-left:0}' styles.css
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add styles.css data/stories.json data/chapter-11-four-rings-literary-v5-*.b64part
+          git commit -m 'Mirror Episode 11 literary rewrite and reader rendering'
+          git push
