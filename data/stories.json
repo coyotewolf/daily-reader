@@ -334,6 +334,37 @@
             "fasten": "固定、繫牢；把一件東西牢牢連接到另一件上。"
           },
           "formatVersion": 2
+        },
+        {
+          "episode": 11,
+          "publishedAt": "2026-09-08",
+          "slug": "four-rings-above-the-river",
+          "formatVersion": 2,
+          "title": {
+            "en": "Chapter Eleven — Four Rings Above the River",
+            "zhHant": "第十一章——河上的四聲鈴",
+            "zhHans": "第十一章——河上的四声铃"
+          },
+          "recap": {
+            "en": "Geralt found Professor Rusk’s hidden refuge beneath the Pontar and learned that Split Tower was a loose chain serving different interests. Then a soaked boy burst through a sealed pipe and warned that bells were being used to make altered river creatures follow the children.",
+            "zh": "傑洛特在龐塔爾河底找到魯斯克教授的祕密避難所，也得知「裂塔」其實是一條服務不同利益的人脈鏈。隨後，一名渾身濕透的男孩從封死的管道闖入，警告有人正用鈴聲操控遭改造的河中生物追蹤孩子。"
+          },
+          "contentFileParts": [
+            "./data/chapter-11-content-01.b64part",
+            "./data/chapter-11-content-02.b64part"
+          ],
+          "glossary": {
+            "shudder": "猛然顫動、震顫；本章用來形容獵魔士徽章受到魔法或異常力量影響。",
+            "rehearse panic": "把恐慌情境反覆演練；表示角色已熟悉緊急撤離流程。",
+            "webbed fingers": "有蹼的手指；常見於適應水域活動的生物。",
+            "frenzy": "瘋狂、失控的激烈狀態。",
+            "maintenance stair": "維修樓梯；供人員檢查管線、水閘或建築設備使用。",
+            "crowbar": "鐵撬、撬棍。",
+            "flood gate": "水閘、防洪閘門；控制水流進出的設施。",
+            "lamp oil": "燈油；油燈使用的燃料。",
+            "resignation": "無奈接受、認命般的情緒。",
+            "physician": "醫師；較正式的用字，本章指替艾文工作的人。"
+          }
         }
       ]
     }
