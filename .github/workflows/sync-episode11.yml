@@ -1,0 +1,57 @@
+name: Sync Episode 11
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/sync-episode11.yml"]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mirror Episode 11 from production
+        run: |
+          set -euo pipefail
+          base='https://path-notes-private-gateway.vercel.app'
+          curl -fsSL "$base/data/stories.json" -o /tmp/prod-stories.json
+          python - <<'PY'
+          import json
+          m=json.load(open('/tmp/prod-stories.json',encoding='utf-8'))
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if x['episode']==11)
+          assert c['publishedAt']=='2026-09-08'
+          assert c['slug']=='four-rings-above-the-river'
+          assert c['contentFileParts']==['./data/chapter-11-content-01.b64part','./data/chapter-11-content-02.b64part']
+          PY
+          for f in chapter-11-content-01.b64part chapter-11-content-02.b64part; do
+            test ! -e "data/$f" || { echo "Refusing overwrite of data/$f"; exit 1; }
+            curl -fsSL "$base/data/$f" -o "data/$f"
+          done
+          python - <<'PY'
+          import json,base64,gzip,pathlib
+          root=pathlib.Path('.')
+          prod=json.load(open('/tmp/prod-stories.json',encoding='utf-8'))
+          pb=next(x for x in prod['books'] if x['slug']=='witcher-path-notes')
+          meta=next(x for x in pb['chapters'] if x['episode']==11)
+          raw=''.join((root/p[2:]).read_text(encoding='utf-8').strip() for p in meta['contentFileParts'])
+          obj=json.loads(gzip.decompress(base64.b64decode(raw,validate=True)).decode('utf-8'))
+          assert obj['schemaVersion']==2 and len(obj['pairs'])==54
+          assert obj['en']==[p['en'] for p in obj['pairs']]
+          assert obj['zh']==[p['zh'] for p in obj['pairs']]
+          assert all(p.get('en','').strip() and p.get('zh','').strip() for p in obj['pairs'])
+          local_path=root/'data/stories.json'
+          local=json.loads(local_path.read_text(encoding='utf-8'))
+          lb=next(x for x in local['books'] if x['slug']=='witcher-path-notes')
+          assert max(x['episode'] for x in lb['chapters'])==10
+          assert not any(x['episode']==11 or x['slug']=='four-rings-above-the-river' for x in lb['chapters'])
+          lb['chapters'].append(meta)
+          lb['chapters'].sort(key=lambda x:int(x['episode']))
+          local_path.write_text(json.dumps(local,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/chapter-11-content-*.b64part data/stories.json
+          git commit -m "Mirror Episode 11 — Four Rings Above the River"
+          git push
