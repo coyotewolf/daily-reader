@@ -350,20 +350,23 @@
             "zh": "傑洛特在龐塔爾河底找到魯斯克教授的祕密避難所，也得知「裂塔」其實是一條服務不同利益的人脈鏈。隨後，一名渾身濕透的男孩從封死的管道闖入，警告有人正用鈴聲操控遭改造的河中生物追蹤孩子。"
           },
           "contentFileParts": [
-            "./data/chapter-11-content-01.b64part",
-            "./data/chapter-11-content-02.b64part"
+            "./data/chapter-11-four-rings-rewrite-v2-01.b64part",
+            "./data/chapter-11-four-rings-rewrite-v2-02.b64part",
+            "./data/chapter-11-four-rings-rewrite-v2-03.b64part",
+            "./data/chapter-11-four-rings-rewrite-v2-04.b64part",
+            "./data/chapter-11-four-rings-rewrite-v2-05.b64part"
           ],
           "glossary": {
-            "shudder": "猛然顫動、震顫；本章用來形容獵魔士徽章受到魔法或異常力量影響。",
-            "rehearse panic": "把恐慌情境反覆演練；表示角色已熟悉緊急撤離流程。",
-            "webbed fingers": "有蹼的手指；常見於適應水域活動的生物。",
-            "frenzy": "瘋狂、失控的激烈狀態。",
-            "maintenance stair": "維修樓梯；供人員檢查管線、水閘或建築設備使用。",
-            "crowbar": "鐵撬、撬棍。",
-            "flood gate": "水閘、防洪閘門；控制水流進出的設施。",
-            "lamp oil": "燈油；油燈使用的燃料。",
-            "resignation": "無奈接受、認命般的情緒。",
-            "physician": "醫師；較正式的用字，本章指替艾文工作的人。"
+            "fold in on himself": "因恐懼、疼痛或自我保護而蜷縮起來。",
+            "masonry": "磚石砌體、石造或磚造結構。",
+            "scar tissue": "疤痕組織；可用來判斷傷口或手術並非剛發生。",
+            "conditioned response": "制約反應；透過反覆刺激建立的自動反應。",
+            "reinforce obedience": "強化服從；以獎賞或刺激讓特定行為更穩定。",
+            "mundane": "平凡、非神祕的；本章反而用來凸顯這套獵捕方法的可複製性。",
+            "insufferable": "令人難以忍受、非常討人厭。",
+            "composure": "鎮定、自制；在壓力下維持冷靜的狀態。",
+            "obsolete": "已過時、失效；情報或方法不再適用。",
+            "heraldry": "紋章與代表家族、國家或組織身分的標誌。"
           }
         }
       ]
