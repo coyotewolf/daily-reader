@@ -1,0 +1,74 @@
+name: Sync Episode 12
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/sync-episode12.yml"]
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mirror Episode 12 from production
+        run: |
+          set -euo pipefail
+          git pull --rebase origin main
+          base='https://path-notes-private-gateway.vercel.app'
+          curl -fsSL "$base/data/stories.json" -o /tmp/prod-stories.json
+          python - <<'PY'
+          import json
+          m=json.load(open('/tmp/prod-stories.json',encoding='utf-8'))
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if int(x['episode'])==12)
+          assert c['publishedAt']=='2026-09-09'
+          assert c['slug']=='the-bell-without-a-hand'
+          assert c['contentFileParts']==[f'./data/chapter-12-content-{i:02d}.b64part' for i in range(1,5)]
+          PY
+          for i in 01 02 03 04; do
+            f="chapter-12-content-$i.b64part"
+            test ! -e "data/$f" || { echo "Refusing overwrite of existing data/$f"; exit 1; }
+            curl -fsSL "$base/data/$f" -o "data/$f"
+          done
+          python - <<'PY'
+          import json,base64,gzip,pathlib,re
+          root=pathlib.Path('.')
+          prod=json.load(open('/tmp/prod-stories.json',encoding='utf-8'))
+          pb=next(x for x in prod['books'] if x['slug']=='witcher-path-notes')
+          meta=next(x for x in pb['chapters'] if int(x['episode'])==12)
+          raw=''.join((root/p[2:]).read_text(encoding='utf-8').strip() for p in meta['contentFileParts'])
+          obj=json.loads(gzip.decompress(base64.b64decode(raw,validate=True)).decode('utf-8'))
+          assert obj['schemaVersion']==2 and len(obj['pairs'])==113
+          assert obj['en']==[p['en'] for p in obj['pairs']]
+          assert obj['zh']==[p['zh'] for p in obj['pairs']]
+          wc=len(re.findall(r"\b[A-Za-z]+(?:['’-][A-Za-z]+)*\b",' '.join(obj['en'])))
+          assert 2063 <= wc <= 2281, wc
+          local_path=root/'data/stories.json'
+          local=json.loads(local_path.read_text(encoding='utf-8'))
+          lb=next(x for x in local['books'] if x['slug']=='witcher-path-notes')
+          assert not any(int(x['episode'])==12 for x in lb['chapters'])
+          lb['chapters'].append(meta)
+          lb['chapters'].sort(key=lambda x:int(x['episode']))
+          local_path.write_text(json.dumps(local,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          print('mirror word count',wc)
+          PY
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/chapter-12-content-*.b64part data/stories.json
+          git commit -m 'Mirror Episode 12 The Bell Without a Hand'
+          git push
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy mirror to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
