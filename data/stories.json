@@ -367,6 +367,41 @@
             "obsolete": "已過時、失效；情報或方法不再適用。",
             "heraldry": "紋章與代表家族、國家或組織身分的標誌。"
           }
+        },
+        {
+          "episode": 12,
+          "publishedAt": "2026-09-09",
+          "slug": "the-bell-without-a-hand",
+          "formatVersion": 2,
+          "title": {
+            "en": "Chapter Twelve — The Bell Without a Hand",
+            "zhHant": "第十二章——無人搖動的鈴",
+            "zhHans": "第十二章——无人摇动的铃"
+          },
+          "recap": {
+            "en": "Geralt and Tomas confronted Aven’s physician at the abandoned pumping house and discovered that Split Tower was only a chain of people with overlapping orders. When the old eastern floodgate opened, something much larger than the altered drowners answered from beneath the Pontar.",
+            "zh": "傑洛特與托馬斯在廢棄抽水房對上艾文的醫師，也發現「裂塔」只是一條彼此命令重疊、目的未必一致的人脈鏈。當舊東側水閘被打開時，龐塔爾河底有某個遠比改造水鬼龐大的東西回應了水流。"
+          },
+          "contentFileParts": [
+            "./data/chapter-12-content-01.b64part",
+            "./data/chapter-12-content-02.b64part",
+            "./data/chapter-12-content-03.b64part",
+            "./data/chapter-12-content-04.b64part"
+          ],
+          "glossary": {
+            "sluice": "水閘、水門；用來控制水流的閘門或通道。",
+            "condemned": "因危險或不適用而被正式封閉、停用。",
+            "clapper": "鈴舌；鈴內撞擊鈴身發聲的部件。",
+            "quay": "碼頭岸壁、石砌碼頭。",
+            "dormant": "休眠的、暫時不活動的。",
+            "masonry": "磚石砌體、石造結構。",
+            "conditioning": "制約；透過反覆刺激建立自動反應。",
+            "mooring post": "繫船樁；船隻靠岸時固定纜繩的柱子。",
+            "translucent": "半透明的；能透光但看不清後方。",
+            "locking pin": "鎖銷；用來固定機械部件位置的金屬銷。",
+            "fused with rust": "因嚴重鏽蝕而黏死、卡死。",
+            "inspection gallery": "檢查廊道；供維修或檢查設備使用的高架通道。"
+          }
         }
       ]
     }
