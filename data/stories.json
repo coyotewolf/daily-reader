@@ -402,6 +402,41 @@
             "fused with rust": "因嚴重鏽蝕而黏死、卡死。",
             "inspection gallery": "檢查廊道；供維修或檢查設備使用的高架通道。"
           }
+        },
+        {
+          "episode": 13,
+          "publishedAt": "2026-09-10",
+          "slug": "the-house-beneath-the-herons",
+          "formatVersion": 2,
+          "title": {
+            "en": "Chapter Thirteen — The House Beneath the Herons",
+            "zhHant": "第十三章——蒼鷺下的宅邸",
+            "zhHans": "第十三章——苍鹭下的宅邸"
+          },
+          "recap": {
+            "en": "At the abandoned pumping house, Geralt helped seal the eastern floodgate and learned that the creature called the Anchor had been cut and studied. In Lysa’s wagon, he then found an iron strongbox marked with a shallow arc over four lines—a symbol neither she nor Sen was willing to explain.",
+            "zh": "在廢棄抽水房，傑洛特協助關閉東側水閘，也發現被稱為「錨」的生物曾遭切割研究。隨後，他在莉莎的馬車裡找到一只鐵製保險箱，箱上印著一道淺弧壓在四條直線之上的記號——莉莎與森都不願解釋它。"
+          },
+          "contentFileParts": [
+            "./data/chapter-13-house-beneath-herons-01.b64part",
+            "./data/chapter-13-house-beneath-herons-02.b64part",
+            "./data/chapter-13-house-beneath-herons-03.b64part",
+            "./data/chapter-13-house-beneath-herons-04.b64part"
+          ],
+          "glossary": {
+            "oiled felt": "浸油毛氈；經油處理、可防潮保護內容物的毛氈。",
+            "camphor": "樟腦；帶有強烈氣味，常見於藥用或防蟲用途。",
+            "bindery": "裝訂坊；進行書籍裝訂、修整與封面的工坊。",
+            "suitability": "適用性、適合程度；本章是用來評估孩童是否符合某種用途的冷酷分類。",
+            "predate": "早於……存在；指某個記號或制度比另一個組織更早出現。",
+            "receiving site": "接收站；先接收、檢查人員或物資，再轉送往其他地方的據點。",
+            "confession": "坦白、供認；通常指承認自己不願面對的責任或事實。",
+            "sedative": "鎮靜劑；降低焦躁、活動或意識程度的藥物。",
+            "alchemical binder": "煉金黏合劑；在煉金配方中用來固定、結合其他成分的材料。",
+            "abbreviation": "縮寫；以較短形式代替完整名稱。",
+            "cellar": "地下室、地窖。",
+            "composure": "鎮定、自制；在壓力下維持外在冷靜的狀態。"
+          }
         }
       ]
     }
