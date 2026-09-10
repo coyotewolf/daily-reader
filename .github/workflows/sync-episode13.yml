@@ -1,0 +1,62 @@
+name: Sync Episode 13
+on:
+  push:
+    branches: ["main"]
+    paths: [".github/workflows/sync-episode13.yml"]
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mirror Episode 13 from production
+        run: |
+          set -euo pipefail
+          git pull --rebase origin main
+          base='https://path-notes-private-gateway.vercel.app'
+          curl -fsSL "$base/data/stories.json" -o /tmp/prod-stories.json
+          python - <<'PY'
+          import json
+          m=json.load(open('/tmp/prod-stories.json',encoding='utf-8'))
+          b=next(x for x in m['books'] if x['slug']=='witcher-path-notes')
+          c=next(x for x in b['chapters'] if int(x['episode'])==13)
+          expected=[f'./data/chapter-13-house-beneath-herons-{i:02d}.b64part' for i in range(1,5)]
+          assert c['publishedAt']=='2026-09-10'
+          assert c['slug']=='the-house-beneath-the-herons'
+          assert c['contentFileParts']==expected
+          PY
+          for i in 01 02 03 04; do
+            f="chapter-13-house-beneath-herons-$i.b64part"
+            test ! -e "data/$f" || { echo "Refusing overwrite of existing data/$f"; exit 1; }
+            curl -fsSL "$base/data/$f" -o "data/$f"
+          done
+          python - <<'PY'
+          import json,base64,gzip,pathlib,re
+          root=pathlib.Path('.')
+          prod=json.load(open('/tmp/prod-stories.json',encoding='utf-8'))
+          pb=next(x for x in prod['books'] if x['slug']=='witcher-path-notes')
+          meta=next(x for x in pb['chapters'] if int(x['episode'])==13)
+          raw=''.join((root/p[2:]).read_text(encoding='utf-8').strip() for p in meta['contentFileParts'])
+          obj=json.loads(gzip.decompress(base64.b64decode(raw,validate=True)).decode('utf-8'))
+          assert obj['schemaVersion']==2 and len(obj['pairs'])==81
+          assert obj['en']==[p['en'] for p in obj['pairs']]
+          assert obj['zh']==[p['zh'] for p in obj['pairs']]
+          assert len(re.findall(r"\b[A-Za-z]+(?:['’-][A-Za-z]+)*\b",'\n'.join(obj['en'])))==1999
+          local_path=root/'data/stories.json'
+          local=json.loads(local_path.read_text(encoding='utf-8'))
+          lb=next(x for x in local['books'] if x['slug']=='witcher-path-notes')
+          assert not any(int(x['episode'])==13 for x in lb['chapters'])
+          assert not any(x['slug']=='the-house-beneath-the-herons' for x in lb['chapters'])
+          lb['chapters'].append(meta)
+          lb['chapters'].sort(key=lambda x:int(x['episode']))
+          local_path.write_text(json.dumps(local,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          python tools/validate_library.py
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/chapter-13-house-beneath-herons-*.b64part data/stories.json
+          git commit -m "Mirror Episode 13"
+          git push
