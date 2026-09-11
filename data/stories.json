@@ -437,6 +437,41 @@
             "cellar": "地下室、地窖。",
             "composure": "鎮定、自制；在壓力下維持外在冷靜的狀態。"
           }
+        },
+        {
+          "episode": 14,
+          "publishedAt": "2026-09-11",
+          "slug": "the-room-without-a-number",
+          "formatVersion": 2,
+          "title": {
+            "en": "Chapter Fourteen — The Room Without a Number",
+            "zhHant": "第十四章——沒有編號的房間",
+            "zhHans": "第十四章——没有编号的房间"
+          },
+          "recap": {
+            "en": "Geralt found records showing that the network behind Split Tower was older than Aven and led to a ruined site called House Four. Marek remembered its stone herons, while Sen revealed that children had once been examined there before being sent elsewhere.",
+            "zh": "傑洛特發現，「裂塔」背後的網絡其實比艾文更早存在，線索並指向一處被稱為「四號宅邸」的廢墟。馬雷克記得那裡的石造蒼鷺，而森也透露，孩子們曾在那裡接受檢查，再被送往其他地方。"
+          },
+          "contentFileParts": [
+            "./data/chapter-14-content-01.b64part",
+            "./data/chapter-14-content-02.b64part",
+            "./data/chapter-14-content-03.b64part",
+            "./data/chapter-14-content-04.b64part"
+          ],
+          "glossary": {
+            "shutters": "窗板；可由室內關上的木製遮窗板。",
+            "disposal": "處理、棄置；本章指以井處理不想留下的東西。",
+            "ornamental pond": "裝飾池塘；主要用於景觀而非實際供水的池塘。",
+            "pedestal": "基座；支撐雕像或柱子的底座。",
+            "whitewashed": "刷白的；以石灰等材料塗成白色。",
+            "dispensary": "藥房、配藥室；存放與調配藥物的房間。",
+            "code lock": "密碼鎖；需輸入特定字母或數字才能打開的鎖。",
+            "corroded": "鏽蝕、腐蝕；金屬因時間與環境而受損。",
+            "predate": "早於……發生或存在。",
+            "wedged": "楔住、卡住；把物體塞進縫隙以阻止移動。",
+            "mechanism engaging": "機構開始咬合、運作。",
+            "professional criticism": "專業批評；托馬斯在緊張情境中的挖苦說法。"
+          }
         }
       ]
     }
