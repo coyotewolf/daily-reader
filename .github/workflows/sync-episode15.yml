@@ -1,0 +1,50 @@
+name: Sync Episode 15
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sync-episode15.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync Episode 15 from production
+        run: |
+          python - <<'PY'
+          import json, urllib.request, pathlib
+          base = 'https://path-notes-private-gateway.vercel.app/'
+          with urllib.request.urlopen(base + 'data/stories.json', timeout=20) as r:
+              prod = json.load(r)
+          pbook = next(b for b in prod['books'] if b['slug'] == 'witcher-path-notes')
+          chapter = next(c for c in pbook['chapters'] if c['episode'] == 15)
+          assert chapter['publishedAt'] == '2026-09-12'
+          assert chapter['slug'] == 'the-names-we-keep'
+          for rel in chapter['contentFileParts']:
+              path = pathlib.Path(rel.replace('./',''))
+              path.parent.mkdir(parents=True, exist_ok=True)
+              with urllib.request.urlopen(base + rel.replace('./',''), timeout=20) as r:
+                  path.write_bytes(r.read())
+          path = pathlib.Path('data/stories.json')
+          local = json.loads(path.read_text(encoding='utf-8'))
+          lbook = next(b for b in local['books'] if b['slug'] == 'witcher-path-notes')
+          lbook['chapters'] = [c for c in lbook['chapters'] if c['episode'] != 15]
+          lbook['chapters'].append(chapter)
+          lbook['chapters'].sort(key=lambda c: c['episode'])
+          path.write_text(json.dumps(local, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+      - name: Validate mirror
+        run: python tools/validate_library.py
+      - name: Commit mirror
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/stories.json data/chapter-15-*.b64part
+          git diff --cached --quiet && exit 0
+          git commit -m 'Mirror Episode 15'
+          git push
