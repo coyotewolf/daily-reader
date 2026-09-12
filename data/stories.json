@@ -472,6 +472,40 @@
             "mechanism engaging": "機構開始咬合、運作。",
             "professional criticism": "專業批評；托馬斯在緊張情境中的挖苦說法。"
           }
+        },
+        {
+          "episode": 15,
+          "publishedAt": "2026-09-12",
+          "slug": "the-names-we-keep",
+          "formatVersion": 2,
+          "title": {
+            "en": "Chapter Fifteen — The Names We Keep",
+            "zhHant": "第十五章——留下的名字",
+            "zhHans": "第十五章——留下的名字"
+          },
+          "recap": {
+            "en": "Geralt, Tomas, and Lysa entered House Four and found a hidden room containing Visenna’s medical case and notebook. Before they could leave, a man speaking through the building’s copper tubes demanded that the notebook be surrendered—and triggered the room’s locking mechanism.",
+            "zh": "傑洛特、托馬斯與莉莎進入四號宅邸，在一間隱藏房間裡找到薇森娜留下的醫療皮箱與筆記。三人還來不及離開，一名透過宅邸銅管說話的男人便要求他們交出筆記，並啟動了房間的鎖閉機關。"
+          },
+          "contentFileParts": [
+            "./data/chapter-15-content-01.b64part",
+            "./data/chapter-15-content-02.b64part",
+            "./data/chapter-15-content-03.b64part"
+          ],
+          "glossary": {
+            "negotiable": "可協商的、可以討價還價或改變條件的。",
+            "sedative": "鎮靜劑；使人昏沉、降低反應或失去意識的藥物。",
+            "furnace shaft": "爐井、爐道；供爐火通風或排煙的垂直通道。",
+            "speaking tube": "傳聲管；利用管道傳遞聲音的簡單通訊設備。",
+            "insignia": "徽記、標誌；通常代表組織、軍隊或學術身分。",
+            "archivist": "檔案員；負責整理、保存與管理紀錄的人。",
+            "patron": "出資者、贊助人；本章指資助研究與轉運網絡的人。",
+            "foothills": "山麓丘陵；高山正式抬升前的低矮丘陵地帶。",
+            "silvered mirror": "鍍銀鏡；此處是一側可反射、另一側可觀察的特殊鏡面。",
+            "destination code": "目的地代碼；以符號或縮寫代替真實地名的編碼。",
+            "wedged": "楔住、卡住；把物件塞進縫隙阻止移動。",
+            "compensation": "賠償、補償；托馬斯拿莉莎被弄壞的十字弓開玩笑。"
+          }
         }
       ]
     }
