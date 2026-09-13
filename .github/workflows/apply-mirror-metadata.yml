@@ -1,0 +1,43 @@
+name: Apply Mirror Metadata
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'drafts/mirror-metadata-*.json'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Append validated metadata
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          root=pathlib.Path('.')
+          meta_path=sorted((root/'drafts').glob('mirror-metadata-*.json'))[-1]
+          meta=json.loads(meta_path.read_text(encoding='utf-8'))
+          p=root/'data/stories.json'
+          data=json.loads(p.read_text(encoding='utf-8'))
+          book=next(b for b in data['books'] if b['slug']=='witcher-path-notes')
+          if not any(c['episode']==meta['episode'] for c in book['chapters']):
+              book['chapters'].append(meta)
+              p.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          python tools/validate_library.py
+      - name: Commit mirror metadata
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/stories.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish Episode 16 mirror metadata'
+            git push origin main
+          fi
